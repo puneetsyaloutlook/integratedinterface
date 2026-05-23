@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integrated Workspace</title>
+<style>
+  :root {
+    --nav-bg: #ffffff;
+    --nav-border: #e5e7eb;
+    --nav-text: #6b7280;
+    --nav-active-text: #111827;
+    --nav-active-bg: #f3f4f6;
+    --page-bg: #f3f4f6;
+    --card-bg: #ffffff;
+    --card-border: #e5e7eb;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-tertiary: #9ca3af;
+    --ok-bg: #ecfdf5; --watch-bg: #fffbeb; --alert-bg: #fef2f2;
+    --ok-border: #a7f3d0; --watch-border: #fde68a; --alert-border: #fecaca;
+    --r-sm: 4px; --r-md: 6px; --r-lg: 8px;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--page-bg); color: var(--text-primary); line-height: 1.5; font-size: 14px; -webkit-font-smoothing: antialiased; margin: 0; padding: 0; height: 100vh; overflow: hidden; }
+  .doc-wrapper { width: 100%; height: 100vh; padding: 0; max-width: none; display: flex; flex-direction: column; }
+  .app-shell { background: var(--page-bg); border-radius: 0; box-shadow: none; display: flex; flex: 1; overflow: hidden; }
+  .l-nav { width: 192px; flex-shrink: 0; background: var(--nav-bg); border-right: 1px solid var(--nav-border); display: flex; flex-direction: column; }
+  .l-nav-brand { display: flex; align-items: center; gap: 9px; padding: 15px 18px 13px; border-bottom: 1px solid var(--nav-border); }
+  .brand-mark { width: 27px; height: 27px; background: #1a1f2e; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .brand-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+  .l-nav-links { flex: 1; padding: 10px 8px; display: flex; flex-direction: column; gap: 1px; }
+  .nav-link { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--nav-text); cursor: pointer; user-select: none; transition: background 0.1s; }
+  .nav-link:hover { background: var(--nav-active-bg); }
+  .nav-link.active { background: var(--nav-active-bg); color: var(--nav-active-text); font-weight: 600; }
+  .nav-link svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.45; }
+  .nav-link.active svg { opacity: 0.75; }
+  .l-nav-foot { padding: 13px 18px; border-top: 1px solid var(--nav-border); display: flex; align-items: center; gap: 9px; }
+  .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #1a1f2e; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .user-name { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+  .page-head { padding: 16px 24px 14px; border-bottom: 1px solid var(--card-border); background: var(--nav-bg); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .page-head h1 { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; }
+  .page-date { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+  .profile-cluster { display: flex; align-items: center; gap: 12px; }
+  .profile-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1a1f2e; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .profile-role { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; }
+  .profile-icon-btn { width: 30px; height: 30px; border: 1px solid var(--card-border); border-radius: var(--r-sm); background: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-tertiary); flex-shrink: 0; }
+  .profile-icon-btn:hover { background: var(--page-bg); color: var(--text-secondary); }
+  .feedback-btn { padding: 5px 12px; font-size: 12px; font-weight: 500; color: var(--text-secondary); border: 1px solid var(--card-border); border-radius: var(--r-sm); background: none; cursor: pointer; white-space: nowrap; font-family: inherit; }
+  .feedback-btn:hover { background: var(--page-bg); }
+  .profile-divider { width: 1px; height: 20px; background: var(--card-border); }
+  .toggle-btn { padding: 5px 14px; font-size: 12px; font-weight: 500; color: var(--text-secondary); background: var(--nav-bg); cursor: pointer; user-select: none; }
+  .toggle-btn.active { background: #1a1f2e; color: #fff; font-weight: 600; }
+  .screen { display: none; flex: 1; overflow-y: auto; }
+  .screen.active { display: flex; flex-direction: column; }
+  .screen.actions-screen.active { flex-direction: row; overflow: hidden; }
+  .page-body { padding: 18px 24px 32px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+  .page-body.row { flex-direction: row; align-items: flex-start; }
+  .page-body.row .card { flex: 1; min-width: 0; }
+  .page-body.row .card-body { grid-template-columns: 1fr; padding: 0; }
+  .page-body.row .col { padding: 12px 20px; border-right: none !important; border-bottom: 1px solid var(--card-border); }
+  .page-body.row .col:last-child { border-bottom: none; }
+  .page-body.row .col-lbl { margin-bottom: 10px; }
+  .page-body.row .card-head { padding: 11px 20px 10px; }
+  .page-body .card { flex: 1; display: flex; flex-direction: column; }
+  .page-body .card .card-body { flex: 1; align-items: stretch; }
+  .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--r-md); box-shadow: var(--card-shadow); }
+  .card-head { padding: 13px 20px 12px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .card-head h2 { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+  .card-head-meta { font-size: 11px; color: var(--text-tertiary); }
+  .card-link { font-size: 12px; color: #2563eb; font-weight: 500; text-decoration: none; white-space: nowrap; }
+  .card-body { padding: 18px 20px 20px; display: grid; gap: 0; align-items: start; }
+  .actions-body { grid-template-columns: 1fr 1fr; }
+  .claims-body { grid-template-columns: 1fr 1fr 1fr; }
+  .work-analytics-body { grid-template-columns: 1fr 1fr 1fr; }
+  .team-analytics-body { grid-template-columns: 1fr 1fr; }
+  .col { padding: 0 20px; }
+  .col:first-child { padding-left: 0; }
+  .col:not(:last-child) { border-right: 1px solid var(--card-border); }
+  .col:last-child { padding-right: 0; }
+  .col-lbl { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-tertiary); margin-bottom: 12px; }
+  .chart-note { font-size: 11px; color: var(--text-tertiary); margin-top: 7px; line-height: 1.5; }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-top: 9px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
+  .swatch { width: 12px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .filter-col { display: flex; flex-direction: column; gap: 10px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field-lbl { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+  .field-note { font-size: 11px; color: var(--text-tertiary); font-style: italic; }
+  .field-select { padding: 7px 28px 7px 9px; font-size: 13px; font-family: inherit; color: var(--text-primary); background: #f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b92a5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 9px center; border: 1px solid var(--card-border); border-radius: var(--r-sm); appearance: none; width: 100%; }
+  .chart-col { display: flex; flex-direction: column; }
+  .week-col { display: flex; flex-direction: column; }
+  .week-bars { display: flex; align-items: flex-end; gap: 6px; height: 88px; }
+  .w-bar-col { flex: 1; height: 100%; display: flex; align-items: flex-end; flex-direction: column; justify-content: flex-end; gap: 1px; }
+  .week-labels { display: flex; gap: 5px; margin-top: 5px; }
+  .w-day { flex: 1; font-size: 10px; color: var(--text-tertiary); text-align: center; }
+  .w-day.today { color: var(--text-secondary); font-weight: 600; }
+  .queue-col { display: flex; flex-direction: column; }
+  .show-by { display: flex; align-items: center; gap: 7px; margin-bottom: 11px; }
+  .show-by-lbl { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+  .pill-toggle { display: flex; border: 1px solid var(--card-border); border-radius: var(--r-sm); overflow: hidden; }
+  .pill-opt { padding: 3px 10px; font-size: 11px; font-weight: 500; color: var(--text-secondary); background: var(--nav-bg); cursor: pointer; }
+  .pill-opt.on { background: #1a1f2e; color: #fff; }
+  .count-row { display: flex; gap: 7px; }
+  .c-tile { flex: 1; padding: 11px 6px; text-align: center; border-radius: var(--r-sm); border: 1px solid var(--card-border); background: var(--page-bg); min-width: 0; transition: border-color 0.15s, background 0.15s; }
+  .c-tile[onclick]:hover { background: #eff6ff; border-color: #2563eb; }
+  .c-tile.urgent { background: var(--alert-bg); border-color: var(--alert-border); }
+  .c-tile.soon { background: var(--watch-bg); border-color: var(--watch-border); }
+  .c-val { font-size: 26px; font-weight: 700; letter-spacing: -1px; line-height: 1; color: var(--text-primary); }
+  .c-tile.urgent .c-val { color: #dc2626; }
+  .c-tile.soon .c-val { color: #d97706; }
+  .c-lbl { font-size: 10px; color: var(--text-tertiary); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .queue-foot { margin-top: 11px; text-align: right; }
+  .ct-col { display: flex; flex-direction: column; }
+  .ct-bars { display: flex; flex-direction: column; gap: 7px; }
+  .ct-row { display: grid; grid-template-columns: 88px 1fr 20px; align-items: center; gap: 8px; }
+  .ct-type-lbl { font-size: 11px; color: var(--text-secondary); text-align: right; }
+  .ct-bar-track { height: 16px; background: var(--page-bg); border-radius: 3px; overflow: hidden; }
+  .ct-bar-fill { height: 100%; border-radius: 3px; }
+  .ct-count { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-align: right; }
+  .oc-col { display: flex; flex-direction: column; }
+  .oc-total { display: flex; align-items: baseline; gap: 7px; padding: 11px 13px; background: var(--page-bg); border: 1px solid var(--card-border); border-radius: var(--r-sm); margin-bottom: 8px; }
+  .oc-num { font-size: 30px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; color: var(--text-primary); }
+  .oc-lbl { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .oc-tiles { display: flex; flex-direction: column; gap: 6px; }
+  .oc-tile { padding: 9px 12px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: space-between; }
+  .oc-tile.no-tasks { background: var(--ok-bg); border: 1px solid var(--ok-border); }
+  .oc-tile.open-tasks { background: var(--watch-bg); border: 1px solid var(--watch-border); }
+  .oc-tile.overdue { background: var(--alert-bg); border: 1px solid var(--alert-border); }
+  .oc-t-lbl { font-size: 12px; color: var(--text-secondary); }
+  .oc-t-num { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
+  .oc-tile.no-tasks .oc-t-num { color: #059669; }
+  .oc-tile.open-tasks .oc-t-num { color: #d97706; }
+  .oc-tile.overdue .oc-t-num { color: #dc2626; }
+  .search-wrap { position: relative; }
+  .search-input { padding: 7px 10px 7px 28px; font-size: 13px; font-family: inherit; color: var(--text-primary); background: var(--page-bg); border: 1px solid var(--card-border); border-radius: var(--r-sm); width: 220px; }
+  .search-input::placeholder { color: var(--text-tertiary); }
+  .search-ico { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 12px; pointer-events: none; }
+  .summary-stats { display: flex; gap: 6px; margin-bottom: 14px; }
+  .stat-tile { flex: 1; padding: 10px 8px; background: var(--page-bg); border: 1px solid var(--card-border); border-radius: var(--r-sm); text-align: center; }
+  .stat-val { font-size: 22px; font-weight: 700; letter-spacing: -1px; line-height: 1; color: var(--text-primary); }
+  .stat-lbl { font-size: 10px; color: var(--text-tertiary); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .stat-delta { font-size: 10px; font-weight: 600; margin-top: 2px; }
+  .delta-up { color: #dc2626; } .delta-ok { color: #059669; } .delta-flat { color: var(--text-tertiary); }
+  .reason-rows { display: flex; flex-direction: column; gap: 6px; }
+  .reason-row { display: grid; grid-template-columns: 160px 1fr 52px; align-items: center; gap: 8px; }
+  .reason-lbl { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .reason-track { height: 8px; background: var(--page-bg); border-radius: 4px; overflow: hidden; }
+  .reason-fill { height: 100%; border-radius: 4px; }
+  .reason-meta { font-size: 11px; color: var(--text-tertiary); text-align: right; }
+  .week-horiz { display: flex; flex-direction: column; gap: 7px; }
+  .wh-row { display: grid; grid-template-columns: 28px 1fr 36px; align-items: center; gap: 8px; }
+  .wh-day { font-size: 11px; color: var(--text-secondary); font-weight: 600; }
+  .wh-track { height: 18px; background: var(--page-bg); border-radius: 3px; overflow: hidden; display: flex; }
+  .wh-seg { height: 100%; }
+  .wh-count { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-align: right; }
+  .capacity-rows { display: flex; flex-direction: column; gap: 5px; }
+  .cap-row { display: grid; grid-template-columns: 72px 40px 1fr 72px; align-items: center; gap: 8px; }
+  .cap-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .cap-count { font-size: 11px; color: var(--text-tertiary); }
+  .cap-status { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 9999px; text-align: center; white-space: nowrap; }
+  .cap-status.ok { background: var(--ok-bg); color: #059669; }
+  .cap-status.watch { background: var(--watch-bg); color: #d97706; }
+  .cap-status.heavy { background: var(--alert-bg); color: #dc2626; }
+  .quality-rows { display: flex; flex-direction: column; gap: 8px; }
+  .qi-row { display: grid; grid-template-columns: 140px 1fr 60px 56px; align-items: center; gap: 8px; }
+  .qi-lbl { font-size: 12px; color: var(--text-secondary); }
+  .qi-track { height: 6px; background: var(--page-bg); border-radius: 3px; overflow: hidden; }
+  .qi-fill { height: 100%; border-radius: 3px; }
+  .qi-val { font-size: 12px; font-weight: 700; color: var(--text-primary); text-align: right; }
+  .qi-delta { font-size: 10px; font-weight: 600; text-align: right; }
+  .list-panel { width: 360px; flex-shrink: 0; border-right: 1px solid var(--card-border); display: flex; flex-direction: column; background: var(--card-bg); }
+  .list-toolbar { padding: 12px 14px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; gap: 8px; }
+  .list-toolbar .search-input { width: 100%; background: var(--page-bg); }
+  .filter-btn { width: 32px; height: 32px; border: 1px solid var(--card-border); border-radius: var(--r-sm); background: var(--page-bg); display: flex; align-items: center; justify-content: center; color: var(--text-secondary); cursor: pointer; flex-shrink: 0; font-size: 13px; }
+  .list-tabs { display: flex; border-bottom: 1px solid var(--card-border); padding: 0 14px; }
+  .list-tab { padding: 9px 12px; font-size: 12px; font-weight: 500; color: var(--text-tertiary); border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px; }
+  .list-tab.active { color: var(--text-primary); font-weight: 700; border-bottom-color: var(--text-primary); }
+  .list-tab .tab-count { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 9999px; background: var(--page-bg); color: var(--text-secondary); margin-left: 4px; }
+  .list-tab.active .tab-count { background: #111827; color: #fff; }
+  .action-list { flex: 1; overflow-y: auto; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
+  .action-card { padding: 11px 12px; border: 1px solid var(--card-border); border-radius: var(--r-md); background: var(--card-bg); cursor: pointer; border-left: 3px solid transparent; }
+  .action-card.selected { border-color: #6366f1; border-left-color: #6366f1; background: #f5f3ff; }
+  .action-card.overdue { border-left-color: #ef4444; }
+  .action-card.overdue.selected { border-color: #ef4444; background: var(--alert-bg); }
+  .action-card-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 7px; line-height: 1.4; }
+  .action-card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; }
+  .meta-item { display: flex; flex-direction: column; gap: 1px; }
+  .meta-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); }
+  .meta-val { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .meta-val.mono { font-variant-numeric: tabular-nums; }
+  .meta-val.alert { color: #dc2626; font-weight: 600; }
+  .meta-val.watch { color: #d97706; font-weight: 600; }
+  .action-card-footer { display: flex; align-items: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+  .label-chip { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 9999px; background: var(--page-bg); color: var(--text-secondary); border: 1px solid var(--card-border); }
+  .status-chip { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 9999px; white-space: nowrap; }
+  .status-chip.overdue { background: var(--alert-bg); color: #dc2626; border: 1px solid var(--alert-border); }
+  .status-chip.due-today { background: var(--watch-bg); color: #d97706; border: 1px solid var(--watch-border); }
+  .status-chip.upcoming { background: var(--ok-bg); color: #059669; border: 1px solid var(--ok-border); }
+  .detail-panel { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--page-bg); }
+  .detail-head { padding: 16px 24px 14px; background: var(--card-bg); border-bottom: 1px solid var(--card-border); }
+  .detail-claim-ref { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .detail-claim-ref a { color: #2563eb; text-decoration: none; font-weight: 500; }
+  .detail-title { font-size: 16px; font-weight: 700; letter-spacing: -0.2px; color: var(--text-primary); margin-bottom: 10px; }
+  .detail-chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .type-chip { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 9999px; background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+  .detail-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr 220px 220px; gap: 0; }
+  .dash-col { padding: 18px 20px; }
+  .dash-col:not(:last-child) { border-right: 1px solid var(--card-border); }
+  .dash-col-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-tertiary); margin-bottom: 12px; display: block; }
+  .health-tiles { display: flex; gap: 8px; }
+  .health-tile { flex: 1; padding: 12px 10px; text-align: center; border-radius: var(--r-sm); border: 1px solid var(--card-border); background: var(--page-bg); }
+  .health-tile.alert { background: var(--alert-bg); border-color: var(--alert-border); }
+  .health-tile.watch { background: var(--watch-bg); border-color: var(--watch-border); }
+  .health-val { font-size: 26px; font-weight: 700; letter-spacing: -1px; line-height: 1; color: var(--text-primary); }
+  .health-tile.alert .health-val { color: #dc2626; }
+  .health-tile.watch .health-val { color: #d97706; }
+  .health-lbl { font-size: 10px; color: var(--text-tertiary); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .pattern-text { font-size: 13px; line-height: 1.65; color: var(--text-secondary); }
+  .pattern-text strong { color: var(--text-primary); }
+  .pattern-meta { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); margin-top: 10px; }
+  .predicted-num { font-size: 36px; font-weight: 700; letter-spacing: -2px; line-height: 1; color: #2563eb; margin-bottom: 6px; }
+  .predicted-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 8px; }
+  .confidence-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .confidence-bar { flex: 1; height: 5px; background: var(--page-bg); border-radius: 3px; overflow: hidden; }
+  .confidence-fill { height: 100%; background: #2563eb; border-radius: 3px; }
+  .confidence-lbl { font-size: 10px; font-weight: 700; color: var(--text-tertiary); white-space: nowrap; }
+  .stage-bars { display: flex; flex-direction: column; gap: 5px; }
+  .stage-bar-row { display: grid; grid-template-columns: 72px 1fr 20px; align-items: center; gap: 6px; }
+  .stage-bar-lbl { font-size: 11px; color: var(--text-secondary); text-align: right; }
+  .stage-bar-track { height: 10px; background: var(--page-bg); border-radius: 3px; overflow: hidden; }
+  .stage-bar-fill { height: 100%; border-radius: 3px; }
+  .stage-bar-count { font-size: 10px; font-weight: 600; color: var(--text-tertiary); }
+  .list-head { padding: 12px 20px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; gap: 10px; }
+  .filter-btn-sm { padding: 7px 12px; border: 1px solid var(--card-border); border-radius: var(--r-sm); background: var(--page-bg); font-size: 12px; color: var(--text-secondary); cursor: pointer; }
+  .claims-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .claims-table th { padding: 9px 12px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); border-bottom: 2px solid var(--card-border); background: var(--page-bg); white-space: nowrap; }
+  .claims-table td { padding: 11px 12px; border-bottom: 1px solid var(--card-border); vertical-align: middle; }
+  .claims-table tr:hover td { background: #f9fafb; }
+  .claims-table tr:last-child td { border-bottom: none; }
+  .claim-num { font-weight: 700; color: var(--text-primary); font-size: 12px; }
+  .claim-customer { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; }
+  .type-badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 9999px; white-space: nowrap; }
+  .type-badge.motor { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+  .flags-cell { display: flex; gap: 4px; flex-wrap: wrap; }
+  .flag { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+  .flag.fraud { background: var(--alert-bg); color: #dc2626; border: 1px solid var(--alert-border); }
+  .flag.legal { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+  .flag.vulnerable { background: var(--watch-bg); color: #d97706; border: 1px solid var(--watch-border); }
+  .flag.third-party { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+  .flag.reputational { background: #fdf2f8; color: #9d174d; border: 1px solid #fbcfe8; }
+  .actioned-date { color: var(--text-primary); font-weight: 500; }
+  .actioned-time { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+  .actioned-by { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+  .stage-progress { display: flex; flex-direction: column; gap: 4px; }
+  .stage-name { font-size: 11px; font-weight: 600; color: var(--text-primary); }
+  .stage-segments { display: flex; gap: 2px; height: 5px; }
+  .stage-seg { flex: 1; border-radius: 2px; background: var(--page-bg); }
+  .stage-seg.done { background: #2563eb; }
+  .stage-seg.current { background: #2563eb; }
+  .age-val { font-weight: 600; color: var(--text-primary); }
+  .due-val { font-size: 11px; margin-top: 2px; }
+  .due-val.overdue { color: #dc2626; font-weight: 600; }
+  .due-val.soon { color: #d97706; }
+  .due-val.ok { color: var(--text-tertiary); }
+  /* ── Task metrics strip ── */
+  .task-metrics-strip { display: grid; grid-template-columns: repeat(5,1fr); border-bottom: 1px solid var(--card-border); }
+  .tm-tile { padding: 14px 18px; border-right: 1px solid var(--card-border); }
+  .tm-tile:last-child { border-right: none; }
+  .tm-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-tertiary); margin-bottom: 4px; }
+  .tm-value { font-size: 26px; font-weight: 700; letter-spacing: -1px; line-height: 1; color: var(--text-primary); }
+  .tm-value.alert { color: #dc2626; } .tm-value.watch { color: #d97706; } .tm-value.ok { color: #059669; }
+  .tm-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 3px; }
+  .tm-sub.alert { color: #dc2626; font-weight: 600; } .tm-sub.ok { color: #059669; }
+  /* ── Operations screen ── */
+  .ops-stat-strip { display: grid; grid-template-columns: repeat(5,1fr); border-bottom: 1px solid var(--card-border); }
+  .ops-stat { padding: 14px 18px; border-right: 1px solid var(--card-border); }
+  .ops-stat:last-child { border-right: none; }
+  .ops-stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-tertiary); margin-bottom: 4px; }
+  .ops-stat-value { font-size: 28px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; color: var(--text-primary); }
+  .ops-stat-value.alert { color: #dc2626; } .ops-stat-value.watch { color: #d97706; }
+  .ops-stat-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 3px; }
+  .ops-stat-sub.alert { color: #dc2626; font-weight: 600; } .ops-stat-sub.watch { color: #d97706; } .ops-stat-sub.ok { color: #059669; }
+  .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .agent-perf-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--card-border); }
+  .agent-perf-row:last-child { border-bottom: none; }
+  .agent-badge { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .agent-perf-name { font-size: 12px; font-weight: 600; color: var(--text-primary); min-width: 120px; }
+  .agent-perf-track { flex: 1; height: 8px; background: var(--page-bg); border-radius: 4px; overflow: hidden; }
+  .agent-perf-fill { height: 100%; border-radius: 4px; }
+  .agent-conf { font-size: 12px; font-weight: 700; min-width: 52px; text-align: right; }
+  .agent-conf.ok { color: #059669; } .agent-conf.watch { color: #d97706; } .agent-conf.alert { color: #dc2626; }
+  .agent-tasks { font-size: 10px; color: var(--text-tertiary); min-width: 64px; text-align: right; }
+  .ops-alert { padding: 9px 12px; border-radius: var(--r-sm); margin-bottom: 6px; font-size: 12px; }
+  .ops-alert.alert { background: var(--alert-bg); border: 1px solid var(--alert-border); color: #991b1b; }
+  .ops-alert.watch { background: var(--watch-bg); border: 1px solid var(--watch-border); color: #92400e; }
+  .ops-alert:last-child { margin-bottom: 0; }
+  .ops-alert-title { font-weight: 600; }
+  .ops-alert-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+  .adv-load-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--card-border); }
+  .adv-load-row:last-child { border-bottom: none; }
+  .adv-name { font-size: 12px; font-weight: 600; color: var(--text-primary); min-width: 96px; }
+  .adv-bar-track { flex: 1; height: 10px; background: var(--page-bg); border-radius: 3px; overflow: hidden; display: flex; gap: 1px; }
+  .adv-seg { height: 100%; }
+  .adv-pct { font-size: 11px; font-weight: 700; min-width: 80px; text-align: right; }
+  .adv-pct.normal { color: var(--text-secondary); } .adv-pct.watch { color: #d97706; } .adv-pct.alert { color: #dc2626; }
+  .ops-qi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ops-qi-tile { padding: 10px 12px; background: var(--page-bg); border-radius: var(--r-sm); border: 1px solid var(--card-border); }
+  .ops-qi-label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+  .ops-qi-val { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text-primary); }
+  .ops-qi-val.alert { color: #dc2626; } .ops-qi-val.watch { color: #d97706; }
+  .ops-qi-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+  /* ── Claim detail ── */
+  .cd-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-tertiary); border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px; user-select: none; }
+  .cd-tab.active { color: var(--text-primary); font-weight: 700; border-bottom-color: var(--text-primary); }
+  .cd-field { display: flex; flex-direction: column; gap: 3px; }
+  .cd-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); }
+  .cd-val { font-size: 13px; color: var(--text-primary); }
+  .sparkle { color: #7c3aed; font-size: 10px; }
+  .ae-item { font-size: 12px; color: var(--text-secondary); line-height: 1.6; padding: 8px 10px; background: var(--page-bg); border-radius: var(--r-sm); border-left: 2px solid var(--card-border); }
+  .tl-entry { display: flex; gap: 14px; padding: 10px 0; position: relative; z-index: 1; }
+  .tl-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0; border: 2px solid var(--card-bg); }
+  .tl-dot.agent { background: #f5f3ff; color: #7c3aed; }
+  .tl-dot.human { background: #eff6ff; color: #2563eb; }
+  .tl-body { flex: 1; padding-top: 4px; }
+  .tl-meta { font-size: 10px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .tl-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .tl-filter-btn { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 9999px; background: var(--page-bg); color: var(--text-secondary); cursor: pointer; user-select: none; border: 1px solid var(--card-border); }
+  .tl-filter-btn.active { background: #1a1f2e; color: #fff; font-weight: 600; border-color: #1a1f2e; }
+</style>
+</head><body>
+<div class="doc-wrapper"><div class="app-shell">
+<nav class="l-nav">
+  <div class="l-nav-brand"><div class="brand-mark">IW</div><span class="brand-name">Integrated Workspace</span></div>
+  <div class="l-nav-links">
+    <div class="nav-link active" onclick="showScreen('home')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6.5L8 2l6 4.5V14H2V6.5z"/></svg>Home</div>
+    <div class="nav-link" onclick="showScreen('actions')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h7M6 8h7M6 12h7"/><path d="M3 4l0 0m0 0"/><polyline points="2,3.5 3,5 5,2.5"/><polyline points="2,7.5 3,9 5,6.5"/><polyline points="2,11.5 3,13 5,10.5"/></svg>Actions</div>
+    <div class="nav-link" onclick="showScreen('claims')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6l-4-4z"/><path d="M9 2v4h4"/><path d="M8 9l-1 3 3-1 2.5-2.5-2-2L8 9z"/></svg>Claims</div>
+    <div class="nav-link" onclick="showScreen('operations')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.5 2a2.5 2.5 0 00-2.45 3L2.5 10.5a1.5 1.5 0 002.1 2.1L10 7a2.5 2.5 0 103-4.5l-1.5 1.5-1-1L12 1.5"/><path d="M2 13.5l1-1"/></svg>Operations</div>
+  </div>
+  <div class="l-nav-foot"><div class="user-avatar">JC</div><span class="user-name">Jamie C.</span></div>
+</nav>
+<div class="main">
+<div class="page-head" id="main-page-head">
+  <div><h1 id="page-title">Home</h1><p class="page-date">Wednesday 1 April 2026</p></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+
+    <div class="profile-cluster">
+      <div class="profile-avatar">JC</div>
+      <div><div class="profile-name">Jamie Chen</div><div class="profile-role">Claims advisor</div></div>
+      <button class="profile-icon-btn" title="Settings">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h12M2 12h12"/><circle cx="5" cy="4" r="1.5" fill="white"/><circle cx="10" cy="8" r="1.5" fill="white"/><circle cx="6" cy="12" r="1.5" fill="white"/></svg>
+      </button>
+      <button class="feedback-btn">Give feedback</button>
+    </div>
+  </div>
+</div>
+<!-- HOME MEMBER -->
+<div class="screen active" id="screen-home-member"><div class="page-body row">
+<div class="card"><div class="card-head"><h2>Actions snapshot</h2>
+<div style="display:flex;align-items:center;gap:6px;">
+<div class="search-wrap"><span class="search-ico">&#9906;</span><input class="search-input" type="text" placeholder="Search actions..." style="width:180px;"></div>
+<button class="filter-btn-sm">&#9776; Filters</button>
+</div></div>
+<div class="card-body actions-body">
+<div class="col chart-col">
+<span class="col-lbl">Current actions list</span>
+<div class="show-by"><span class="show-by-lbl">Show by</span><div class="pill-toggle"><div class="pill-opt">Urgency</div><div class="pill-opt on">Type</div></div></div>
+<div id="current-actions-list" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;">
+<div class="c-tile" style="cursor:pointer;" onclick="showScreen('actions')"><div class="c-val">08</div><div class="c-lbl">Approvals</div></div>
+<div class="c-tile" style="cursor:pointer;" onclick="showScreen('actions')"><div class="c-val">05</div><div class="c-lbl">Assessments</div></div>
+<div class="c-tile" style="cursor:pointer;" onclick="showScreen('actions')"><div class="c-val">12</div><div class="c-lbl">Verifications</div></div>
+<div class="c-tile" style="cursor:pointer;" onclick="showScreen('actions')"><div class="c-val">03</div><div class="c-lbl">Exceptions</div></div>
+<div class="c-tile" style="cursor:pointer;" onclick="showScreen('actions')"><div class="c-val">02</div><div class="c-lbl">Liability</div></div>
+<div class="c-tile" style="cursor:pointer;" onclick="showScreen('actions')"><div class="c-val">04</div><div class="c-lbl">Coverage</div></div>
+<div class="c-tile" style="cursor:pointer;" onclick="showScreen('actions')"><div class="c-val">10</div><div class="c-lbl">Settlements</div></div>
+<div class="c-tile" style="cursor:pointer;" onclick="showScreen('actions')"><div style="font-size:11px;font-weight:600;color:#2563eb;line-height:1.4;">Open full actions list</div></div>
+</div>
+<span class="col-lbl" style="display:block;margin-top:16px;">Action completion time</span>
+<svg width="100%" height="105" viewBox="0 0 300 105" preserveAspectRatio="none" style="display:block;">
+<line x1="0" y1="18" x2="300" y2="18" stroke="#e5e7eb" stroke-width="1"/><line x1="0" y1="40" x2="300" y2="40" stroke="#e5e7eb" stroke-width="1"/><line x1="0" y1="62" x2="300" y2="62" stroke="#e5e7eb" stroke-width="1"/>
+<polyline points="0,65 60,57 120,52 180,58 240,46 300,50" fill="none" stroke="#6366f1" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="0,50 60,44 120,58 180,40 240,36 300,32" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3"/>
+<polyline points="0,75 60,68 120,72 180,65 240,61 300,57" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="2 3"/>
+<line x1="0" y1="84" x2="300" y2="84" stroke="#e5e7eb" stroke-width="1"/>
+<text x="0" y="96" font-size="9" fill="#9ca3af">Nov</text><text x="54" y="96" font-size="9" fill="#9ca3af">Dec</text><text x="113" y="96" font-size="9" fill="#9ca3af">Jan</text><text x="170" y="96" font-size="9" fill="#9ca3af">Feb</text><text x="226" y="96" font-size="9" fill="#9ca3af">Mar</text><text x="278" y="96" font-size="9" fill="#9ca3af">Apr</text>
+</svg>
+<div class="chart-legend"><div class="legend-item"><div class="swatch" style="background:#6366f1"></div>Approvals</div><div class="legend-item"><div class="swatch" style="background:#06b6d4"></div>Assessments</div><div class="legend-item"><div class="swatch" style="background:#f59e0b"></div>Verifications</div><div class="legend-item"><div class="swatch" style="background:#10b981"></div>Exceptions</div></div>
+<p class="chart-note">Average completion time by action type, last 6 months</p>
+</div>
+<div class="col week-col"><span class="col-lbl">Week ahead</span>
+<div class="week-bars" style="align-items:flex-end;gap:6px;">
+<div class="w-bar-col" style="flex-direction:column;align-items:stretch;justify-content:flex-end;gap:1px;"><div style="height:31px;background:#6366f1;border-radius:2px 2px 0 0;"></div><div style="height:20px;background:#06b6d4;"></div><div style="height:19px;background:#f59e0b;"></div><div style="height:12px;background:#10b981;"></div></div>
+<div class="w-bar-col" style="flex-direction:column;align-items:stretch;justify-content:flex-end;gap:1px;"><div style="height:25px;background:#6366f1cc;border-radius:2px 2px 0 0;"></div><div style="height:16px;background:#06b6d4cc;"></div><div style="height:14px;background:#f59e0bcc;"></div><div style="height:9px;background:#10b981cc;"></div></div>
+<div class="w-bar-col" style="flex-direction:column;align-items:stretch;justify-content:flex-end;gap:1px;"><div style="height:19px;background:#6366f1cc;border-radius:2px 2px 0 0;"></div><div style="height:12px;background:#06b6d4cc;"></div><div style="height:10px;background:#f59e0bcc;"></div><div style="height:7px;background:#10b981cc;"></div></div>
+<div class="w-bar-col" style="flex-direction:column;align-items:stretch;justify-content:flex-end;gap:1px;"><div style="height:25px;background:#6366f1cc;border-radius:2px 2px 0 0;"></div><div style="height:18px;background:#06b6d4cc;"></div><div style="height:16px;background:#f59e0bcc;"></div><div style="height:10px;background:#10b981cc;"></div></div>
+<div class="w-bar-col" style="flex-direction:column;align-items:stretch;justify-content:flex-end;gap:1px;"><div style="height:13px;background:#6366f1cc;border-radius:2px 2px 0 0;"></div><div style="height:10px;background:#06b6d4cc;"></div><div style="height:8px;background:#f59e0bcc;"></div><div style="height:5px;background:#10b981cc;"></div></div>
+</div>
+<div class="week-labels"><div class="w-day today">Wed</div><div class="w-day">Thu</div><div class="w-day">Fri</div><div class="w-day">Mon</div><div class="w-day">Tue</div></div>
+<div class="chart-legend" style="margin-top:8px;"><div class="legend-item"><div class="swatch" style="background:#6366f1"></div>Approvals</div><div class="legend-item"><div class="swatch" style="background:#06b6d4"></div>Assessments</div><div class="legend-item"><div class="swatch" style="background:#f59e0b"></div>Verifications</div><div class="legend-item"><div class="swatch" style="background:#10b981"></div>Exceptions</div></div>
+<p class="chart-note">Predicted action volume by type, next five working days</p></div>
+</div></div>
+<div class="card"><div class="card-head"><h2>Claims snapshot</h2>
+<div style="display:flex;align-items:center;gap:6px;">
+<div class="search-wrap"><span class="search-ico">&#9906;</span><input class="search-input" type="text" placeholder="Search for a claim..." style="width:180px;"></div>
+<button class="filter-btn-sm">&#9776; Filters</button>
+</div></div>
+<div class="card-body claims-body">
+<div class="col chart-col"><span class="col-lbl">Claim completion time</span>
+<svg width="100%" height="120" viewBox="0 0 400 120" preserveAspectRatio="none" style="display:block;width:100%;">
+<text x="0" y="16" font-size="8" fill="#9ca3af">15d</text>
+<text x="0" y="45" font-size="8" fill="#9ca3af">10d</text>
+<text x="0" y="67" font-size="8" fill="#9ca3af">5d</text>
+<text x="0" y="89" font-size="8" fill="#9ca3af">0</text>
+<line x1="28" y1="14" x2="28" y2="88" stroke="#e5e7eb" stroke-width="1"/>
+<polygon points="28,88 101,88 174,88 247,88 320,88 400,88 400,84.2 320,82.3 247,80.5 174,82.3 101,82.3 28,80.5" fill="#dbeafe"/>
+<polygon points="28,80.5 101,82.3 174,82.3 247,80.5 320,82.3 400,84.2 400,69.2 320,69.2 247,63.6 174,67.5 101,63.6 28,63.6" fill="#93c5fd"/>
+<polygon points="28,63.6 101,63.6 174,67.5 247,63.6 320,69.2 400,69.2 400,46.6 320,50.4 247,42.8 174,37.2 101,39.1 28,37.2" fill="#60a5fa"/>
+<polygon points="28,37.2 101,39.1 174,37.2 247,42.8 320,50.4 400,46.6 400,35.3 320,39.1 247,29.7 174,25.9 101,25.9 28,24.0" fill="#3b82f6"/>
+<polygon points="28,24.0 101,25.9 174,25.9 247,29.7 320,39.1 400,35.3 400,27.8 320,29.7 247,22.1 174,16.5 101,14.5 28,14.5" fill="#1d4ed8"/>
+<line x1="28" y1="88" x2="400" y2="88" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="28" y1="14" x2="400" y2="14" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3 3"/>
+<line x1="28" y1="40" x2="400" y2="40" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3 3"/>
+<line x1="28" y1="64" x2="400" y2="64" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="35" y="100" font-size="9" fill="#9ca3af">Nov</text><text x="103" y="100" font-size="9" fill="#9ca3af">Dec</text><text x="174" y="100" font-size="9" fill="#9ca3af">Jan</text><text x="245" y="100" font-size="9" fill="#9ca3af">Feb</text><text x="316" y="100" font-size="9" fill="#9ca3af">Mar</text><text x="374" y="100" font-size="9" fill="#9ca3af">Apr</text>
+</svg>
+<div class="chart-legend"><div class="legend-item"><div class="swatch" style="background:#1d4ed8"></div>Closure</div><div class="legend-item"><div class="swatch" style="background:#3b82f6"></div>Settlement</div><div class="legend-item"><div class="swatch" style="background:#60a5fa"></div>Liability</div><div class="legend-item"><div class="swatch" style="background:#93c5fd"></div>Assessment</div><div class="legend-item"><div class="swatch" style="background:#dbeafe;border:1px solid #bfdbfe"></div>Lodgement</div></div>
+<p class="chart-note">Average time in each stage, trending over the past 6 months</p></div>
+<div class="col ct-col"><span class="col-lbl">Claims by stage</span>
+<div class="ct-bars">
+<div class="ct-row"><span class="ct-type-lbl">Lodgement</span><div class="ct-bar-track"><div class="ct-bar-fill" style="width:18%;background:#dbeafe;"></div></div><span class="ct-count">3</span></div>
+<div class="ct-row"><span class="ct-type-lbl">Assessment</span><div class="ct-bar-track"><div class="ct-bar-fill" style="width:35%;background:#2563eb;"></div></div><span class="ct-count">6</span></div>
+<div class="ct-row"><span class="ct-type-lbl">Liability</span><div class="ct-bar-track"><div class="ct-bar-fill" style="width:47%;background:#2563eb;"></div></div><span class="ct-count">8</span></div>
+<div class="ct-row"><span class="ct-type-lbl">Repair auth</span><div class="ct-bar-track"><div class="ct-bar-fill" style="width:29%;background:#2563eb;"></div></div><span class="ct-count">5</span></div>
+<div class="ct-row"><span class="ct-type-lbl">Settlement</span><div class="ct-bar-track"><div class="ct-bar-fill" style="width:41%;background:#2563eb;"></div></div><span class="ct-count">7</span></div>
+<div class="ct-row"><span class="ct-type-lbl">Recovery</span><div class="ct-bar-track"><div class="ct-bar-fill" style="width:12%;background:#2563eb;"></div></div><span class="ct-count">2</span></div>
+<div class="ct-row"><span class="ct-type-lbl">Closure</span><div class="ct-bar-track"><div class="ct-bar-fill" style="width:18%;background:#1e3a8a;"></div></div><span class="ct-count">3</span></div>
+</div>
+<p class="chart-note" style="margin-top:10px">Distribution of open claims across stages</p></div>
+<div class="col oc-col"><span class="col-lbl">Open claims</span>
+<div class="oc-total"><span class="oc-num">34</span><span class="oc-lbl">open claims</span></div>
+<div class="oc-tiles">
+<div class="oc-tile no-tasks"><span class="oc-t-lbl">No open tasks</span><span class="oc-t-num">10</span></div>
+<div class="oc-tile open-tasks"><span class="oc-t-lbl">With open tasks</span><span class="oc-t-num">18</span></div>
+<div class="oc-tile overdue"><span class="oc-t-lbl">With overdue tasks</span><span class="oc-t-num">06</span></div>
+</div></div>
+</div></div>
+</div></div>
+<!-- ACTIONS SCREEN -->
+<div class="screen actions-screen" id="screen-actions">
+<div class="list-panel">
+<div class="list-toolbar"><div class="search-wrap" style="flex:1;"><span class="search-ico">&#9906;</span><input class="search-input" type="text" placeholder="Search text / ID..." style="width:100%;"></div><div class="filter-btn">&#9776;</div></div>
+<div class="list-tabs"><div class="list-tab">All <span class="tab-count">22</span></div><div class="list-tab active">Overdue <span class="tab-count">3</span></div><div class="list-tab">Due today <span class="tab-count">8</span></div><div class="list-tab">Upcoming <span class="tab-count">11</span></div></div>
+<div class="action-list">
+<div class="action-card overdue selected">
+<div class="action-card-title">Approve total loss determination</div>
+<div class="action-card-meta"><div class="meta-item"><span class="meta-lbl">Status</span><span class="meta-val alert">Overdue</span></div><div class="meta-item"><span class="meta-lbl">Received + due</span><span class="meta-val alert">24 Mar &rarr; 27 Mar</span></div><div class="meta-item"><span class="meta-lbl">Claim</span><span class="meta-val mono">Motor #4821</span></div><div class="meta-item"><span class="meta-lbl">Action type</span><span class="meta-val">Approval</span></div></div>
+<div class="action-card-footer"><span class="status-chip overdue">Overdue 5 days</span><span class="label-chip">Total loss</span><span class="label-chip">High value</span></div>
+</div>
+<div class="action-card overdue">
+<div class="action-card-title">Assess liability, disputed fault</div>
+<div class="action-card-meta"><div class="meta-item"><span class="meta-lbl">Status</span><span class="meta-val alert">Overdue</span></div><div class="meta-item"><span class="meta-lbl">Received + due</span><span class="meta-val alert">22 Mar &rarr; 26 Mar</span></div><div class="meta-item"><span class="meta-lbl">Claim</span><span class="meta-val mono">Motor #3390</span></div><div class="meta-item"><span class="meta-lbl">Action type</span><span class="meta-val">Assessment</span></div></div>
+<div class="action-card-footer"><span class="status-chip overdue">Overdue 6 days</span><span class="label-chip">Liability</span><span class="label-chip">Third party</span></div>
+</div>
+<div class="action-card overdue">
+<div class="action-card-title">Approve deductions (excess, salvage, finance)</div>
+<div class="action-card-meta"><div class="meta-item"><span class="meta-lbl">Status</span><span class="meta-val alert">Overdue</span></div><div class="meta-item"><span class="meta-lbl">Received + due</span><span class="meta-val alert">25 Mar &rarr; 28 Mar</span></div><div class="meta-item"><span class="meta-lbl">Claim</span><span class="meta-val mono">Motor #5102</span></div><div class="meta-item"><span class="meta-lbl">Action type</span><span class="meta-val">Approval</span></div></div>
+<div class="action-card-footer"><span class="status-chip overdue">Overdue 4 days</span><span class="label-chip">Deductions</span><span class="label-chip">Finance payout</span></div>
+</div>
+</div></div>
+<div class="detail-panel">
+<div class="detail-head">
+<div class="detail-claim-ref">Motor #4821 &nbsp;&middot;&nbsp; Sarah Chen &nbsp;&middot;&nbsp; 2019 Mazda CX-5 <a href="#">View full claim &rsaquo;</a></div>
+<div class="detail-title">Approve total loss determination</div>
+<div class="detail-chips"><span class="status-chip overdue">Overdue 5 days</span><span class="type-chip">Approval</span><span class="label-chip">Total loss</span><span class="label-chip">High value</span></div>
+</div>
+<div class="detail-body"><p style="font-size:13px;color:var(--text-tertiary);font-style:italic;">Either low-code or pro-code page here.</p></div>
+</div>
+</div>
+
+<!-- CLAIMS SCREEN -->
+<div class="screen" id="screen-claims"><div class="page-body">
+<div class="card">
+<div class="task-metrics-strip">
+<div class="tm-tile"><div class="tm-label">Tasks completed &middot; today</div><div class="tm-value">284</div><div class="tm-sub ok">+18% vs yesterday</div></div>
+<div class="tm-tile"><div class="tm-label">Queue depth</div><div class="tm-value watch">47</div><div class="tm-sub">Investigation &amp; assessment</div></div>
+<div class="tm-tile"><div class="tm-label">Tasks overdue</div><div class="tm-value alert">8</div><div class="tm-sub alert">3 blocking downstream</div></div>
+<div class="tm-tile"><div class="tm-label">Agent-completed</div><div class="tm-value">84%</div><div class="tm-sub">16% required human review</div></div>
+<div class="tm-tile"><div class="tm-label">Rework rate &middot; this week</div><div class="tm-value ok">3.1%</div><div class="tm-sub ok">Within target</div></div>
+</div>
+</div>
+<div class="card">
+<div class="dashboard-grid">
+<div class="dash-col"><span class="dash-col-lbl">Portfolio health</span>
+<div class="health-tiles"><div class="health-tile"><div class="health-val">34</div><div class="health-lbl">Open claims</div></div><div class="health-tile alert"><div class="health-val">06</div><div class="health-lbl">Overdue</div></div><div class="health-tile watch"><div class="health-val">08</div><div class="health-lbl">Due today</div></div><div class="health-tile"><div class="health-val">20</div><div class="health-lbl">Upcoming</div></div></div></div>
+<div class="dash-col"><span class="dash-col-lbl">Escalation pattern</span>
+<p class="pattern-text">Liability disputes up <strong>40%</strong> this week across motor claims. 6 of your 14 escalations involve third-party fault.</p>
+<p class="pattern-meta">Pattern detected &middot; 7 days</p></div>
+<div class="dash-col"><span class="dash-col-lbl">Predicted load</span>
+<div class="predicted-num">+6</div>
+<p class="predicted-desc">New claims expected this week, based on lodgement trends and current pipeline.</p>
+<div class="confidence-bar-wrap"><div class="confidence-bar"><div class="confidence-fill" style="width:72%;"></div></div><span class="confidence-lbl">72% confidence</span></div></div>
+<div class="dash-col"><span class="dash-col-lbl">Claims by stage</span>
+<div class="stage-bars">
+<div class="stage-bar-row"><span class="stage-bar-lbl">Lodgement</span><div class="stage-bar-track"><div class="stage-bar-fill" style="width:18%;background:#dbeafe;"></div></div><span class="stage-bar-count">3</span></div>
+<div class="stage-bar-row"><span class="stage-bar-lbl">Assessment</span><div class="stage-bar-track"><div class="stage-bar-fill" style="width:35%;background:#2563eb;"></div></div><span class="stage-bar-count">6</span></div>
+<div class="stage-bar-row"><span class="stage-bar-lbl">Liability</span><div class="stage-bar-track"><div class="stage-bar-fill" style="width:47%;background:#2563eb;"></div></div><span class="stage-bar-count">8</span></div>
+<div class="stage-bar-row"><span class="stage-bar-lbl">Repair auth</span><div class="stage-bar-track"><div class="stage-bar-fill" style="width:29%;background:#2563eb;"></div></div><span class="stage-bar-count">5</span></div>
+<div class="stage-bar-row"><span class="stage-bar-lbl">Settlement</span><div class="stage-bar-track"><div class="stage-bar-fill" style="width:41%;background:#2563eb;"></div></div><span class="stage-bar-count">7</span></div>
+<div class="stage-bar-row"><span class="stage-bar-lbl">Recovery</span><div class="stage-bar-track"><div class="stage-bar-fill" style="width:12%;background:#2563eb;"></div></div><span class="stage-bar-count">2</span></div>
+<div class="stage-bar-row"><span class="stage-bar-lbl">Closure</span><div class="stage-bar-track"><div class="stage-bar-fill" style="width:18%;background:#1e3a8a;"></div></div><span class="stage-bar-count">3</span></div>
+</div></div>
+</div></div>
+<div class="card" style="flex:1;">
+<div class="list-head"><div class="search-wrap"><span class="search-ico">&#9906;</span><input class="search-input" type="text" placeholder="Search claims..."></div><button class="filter-btn-sm">&#9776; Filter</button></div>
+<table class="claims-table">
+<thead><tr><th>Claim</th><th>Claim type</th><th>Flags</th><th>Last actioned</th><th>Last actioned by</th><th>Stage</th><th>Claim status</th><th>Age &middot; Due</th></tr></thead>
+<tbody>
+<tr style="cursor:pointer;" onclick="showClaimDetail('4821')">
+<td><div class="claim-num">Motor #4821</div><div class="claim-customer">Sarah Chen</div></td>
+<td><span class="type-badge motor">Motor</span></td>
+<td><div class="flags-cell"><span class="flag fraud">Fraud</span><span class="flag legal">Legal</span></div></td>
+<td><div class="actioned-date">30 Mar 2026</div><div class="actioned-time">9:14 am AEST</div></td>
+<td><div class="actioned-by">Agent</div></td>
+<td><div class="stage-progress"><span class="stage-name">Settlement</span><div class="stage-segments"><div class="stage-seg done"></div><div class="stage-seg done"></div><div class="stage-seg done"></div><div class="stage-seg done"></div><div class="stage-seg current"></div><div class="stage-seg"></div><div class="stage-seg"></div></div></div></td>
+<td><span class="status-chip overdue">Overdue</span></td>
+<td><div class="age-val">47d</div><div class="due-val overdue">Overdue 3d</div></td>
+</tr>
+<tr><td><div class="claim-num">Motor #5204</div><div class="claim-customer">James Okonkwo</div></td><td><span class="type-badge motor">Motor</span></td><td><div class="flags-cell"><span class="flag vulnerable">Vulnerable</span></div></td><td><div class="actioned-date">29 Mar 2026</div><div class="actioned-time">3:47 pm AEST</div></td><td><div class="actioned-by">J. Chen</div></td><td><div class="stage-progress"><span class="stage-name">Liability</span><div class="stage-segments"><div class="stage-seg done"></div><div class="stage-seg done"></div><div class="stage-seg current"></div><div class="stage-seg"></div><div class="stage-seg"></div><div class="stage-seg"></div><div class="stage-seg"></div></div></div></td><td><span class="status-chip due-today">Due today</span></td><td><div class="age-val">12d</div><div class="due-val soon">Due today</div></td></tr>
+<tr><td><div class="claim-num">Motor #6614</div><div class="claim-customer">Rachel Nguyen</div></td><td><span class="type-badge motor">Motor</span></td><td><div class="flags-cell"><span class="flag third-party">Third party</span><span class="flag reputational">Reputational</span></div></td><td><div class="actioned-date">28 Mar 2026</div><div class="actioned-time">11:22 am AEST</div></td><td><div class="actioned-by">Agent</div></td><td><div class="stage-progress"><span class="stage-name">Repair auth</span><div class="stage-segments"><div class="stage-seg done"></div><div class="stage-seg done"></div><div class="stage-seg done"></div><div class="stage-seg current"></div><div class="stage-seg"></div><div class="stage-seg"></div><div class="stage-seg"></div></div></div></td><td><span class="status-chip upcoming">Upcoming</span></td><td><div class="age-val">6d</div><div class="due-val ok">Due in 8d</div></td></tr>
+<tr><td><div class="claim-num">Motor #3990</div><div class="claim-customer">David Mackay</div></td><td><span class="type-badge motor">Motor</span></td><td><div class="flags-cell"><span style="font-size:11px;color:var(--text-tertiary);">None</span></div></td><td><div class="actioned-date">26 Mar 2026</div><div class="actioned-time">2:05 pm AEST</div></td><td><div class="actioned-by">J. Chen</div></td><td><div class="stage-progress"><span class="stage-name">Assessment</span><div class="stage-segments"><div class="stage-seg done"></div><div class="stage-seg current"></div><div class="stage-seg"></div><div class="stage-seg"></div><div class="stage-seg"></div><div class="stage-seg"></div><div class="stage-seg"></div></div></div></td><td><span class="status-chip upcoming">Upcoming</span></td><td><div class="age-val">29d</div><div class="due-val ok">Due in 14d</div></td></tr>
+<tr><td><div class="claim-num">Motor #7102</div><div class="claim-customer">Priya Sharma</div></td><td><span class="type-badge motor">Motor</span></td><td><div class="flags-cell"><span class="flag vulnerable">Vulnerable</span></div></td><td><div class="actioned-date">27 Mar 2026</div><div class="actioned-time">10:30 am AEST</div></td><td><div class="actioned-by">Agent</div></td><td><div class="stage-progress"><span class="stage-name">Lodgement</span><div class="stage-segments"><div class="stage-seg current"></div><div class="stage-seg"></div><div class="stage-seg"></div><div class="stage-seg"></div><div class="stage-seg"></div><div class="stage-seg"></div><div class="stage-seg"></div></div></div></td><td><span class="status-chip due-today">Due today</span></td><td><div class="age-val">2d</div><div class="due-val soon">Due today</div></td></tr>
+<tr><td><div class="claim-num">Motor #5891</div><div class="claim-customer">Marcus Tran</div></td><td><span class="type-badge motor">Motor</span></td><td><div class="flags-cell"><span class="flag legal">Legal</span></div></td><td><div class="actioned-date">25 Mar 2026</div><div class="actioned-time">4:18 pm AEST</div></td><td><div class="actioned-by">J. Chen</div></td><td><div class="stage-progress"><span class="stage-name">Recovery</span><div class="stage-segments"><div class="stage-seg done"></div><div class="stage-seg done"></div><div class="stage-seg done"></div><div class="stage-seg done"></div><div class="stage-seg done"></div><div class="stage-seg current"></div><div class="stage-seg"></div></div></div></td><td><span class="status-chip overdue">Overdue</span></td><td><div class="age-val">41d</div><div class="due-val overdue">Overdue 1d</div></td></tr>
+</tbody></table>
+</div>
+</div></div>
+<!-- OPERATIONS SCREEN -->
+<div class="screen" id="screen-operations"><div class="page-body">
+
+<div style="display:flex;align-items:center;gap:10px;padding:4px 0 2px;"><h2 style="font-size:16px;font-weight:700;letter-spacing:-0.2px;color:var(--text-primary);">Team analytics</h2><select class="field-select" style="width:auto;font-size:11px;padding:3px 24px 3px 8px;"><option>Last 7 days</option><option>Last 14 days</option><option>Last 30 days</option><option>This month</option><option>Last month</option></select></div>
+
+<div class="card">
+  <div class="ops-stat-strip">
+    <div class="ops-stat"><div class="ops-stat-label">Actions completed</div><div class="ops-stat-value">98</div><div class="ops-stat-sub ok">&uarr; from 84</div></div>
+    <div class="ops-stat"><div class="ops-stat-label">Actions in progress</div><div class="ops-stat-value">22</div><div class="ops-stat-sub">stable</div></div>
+    <div class="ops-stat"><div class="ops-stat-label">Actions overdue</div><div class="ops-stat-value alert">8</div><div class="ops-stat-sub alert">&uarr; from 5</div></div>
+    <div class="ops-stat"><div class="ops-stat-label">SLA compliance</div><div class="ops-stat-value">94%</div><div class="ops-stat-sub">stable</div></div>
+    <div class="ops-stat"><div class="ops-stat-label">Escalation rate</div><div class="ops-stat-value watch">22%</div><div class="ops-stat-sub watch">&uarr; from 18%</div></div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+  <div class="card" style="grid-column:span 2;">
+    <div class="card-head">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <h2>Team performance</h2>
+        <span class="status-chip overdue">2 overloaded</span>
+      </div>
+      <span class="card-head-meta">6 advisors &nbsp;&middot;&nbsp; tasks today</span>
+    </div>
+    <div style="padding:16px 20px;">
+      <div style="display:grid;grid-template-columns:100px 52px 1fr 130px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--card-border);">
+        <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Jamie Chen</span>
+        <span style="font-size:11px;color:var(--text-tertiary);">28 tasks</span>
+        <div style="height:10px;background:var(--page-bg);border-radius:3px;overflow:hidden;display:flex;"><div style="width:46%;background:#6366f1;"></div><div style="width:25%;background:#ef4444;"></div><div style="width:18%;background:#f59e0b;"></div><div style="width:11%;background:#06b6d4;"></div></div>
+        <span style="font-size:11px;font-weight:700;color:#dc2626;text-align:right;">97% &nbsp;&middot;&nbsp; Overloaded</span>
+      </div>
+      <div style="display:grid;grid-template-columns:100px 52px 1fr 130px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--card-border);">
+        <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Rachel Kim</span>
+        <span style="font-size:11px;color:var(--text-tertiary);">22 tasks</span>
+        <div style="height:10px;background:var(--page-bg);border-radius:3px;overflow:hidden;display:flex;"><div style="width:50%;background:#6366f1;"></div><div style="width:18%;background:#ef4444;"></div><div style="width:18%;background:#f59e0b;"></div><div style="width:14%;background:#06b6d4;"></div></div>
+        <span style="font-size:11px;font-weight:700;color:#dc2626;text-align:right;">91% &nbsp;&middot;&nbsp; Overloaded</span>
+      </div>
+      <div style="display:grid;grid-template-columns:100px 52px 1fr 130px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--card-border);">
+        <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Priya Nair</span>
+        <span style="font-size:11px;color:var(--text-tertiary);">19 items</span>
+        <div style="height:10px;background:var(--page-bg);border-radius:3px;overflow:hidden;display:flex;"><div style="width:50%;background:#6366f1;"></div><div style="width:12%;background:#ef4444;"></div><div style="width:6%;background:#f59e0b;"></div><div style="width:4%;background:#06b6d4;"></div></div>
+        <span style="font-size:11px;font-weight:700;color:#d97706;text-align:right;">72% &nbsp;&middot;&nbsp; Heavy</span>
+      </div>
+      <div style="display:grid;grid-template-columns:100px 52px 1fr 130px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--card-border);">
+        <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Sanjay Patel</span>
+        <span style="font-size:11px;color:var(--text-tertiary);">19 tasks</span>
+        <div style="height:10px;background:var(--page-bg);border-radius:3px;overflow:hidden;display:flex;width:68%;"><div style="width:55%;background:#6366f1;"></div><div style="width:16%;background:#ef4444;"></div><div style="width:16%;background:#f59e0b;"></div><div style="width:13%;background:#06b6d4;"></div></div>
+        <span style="font-size:11px;font-weight:700;color:#059669;text-align:right;">62% &nbsp;&middot;&nbsp; Healthy</span>
+      </div>
+      <div style="display:grid;grid-template-columns:100px 52px 1fr 130px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--card-border);">
+        <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Thi Nguyen</span>
+        <span style="font-size:11px;color:var(--text-tertiary);">18 tasks</span>
+        <div style="height:10px;background:var(--page-bg);border-radius:3px;overflow:hidden;display:flex;width:64%;"><div style="width:56%;background:#6366f1;"></div><div style="width:11%;background:#ef4444;"></div><div style="width:22%;background:#f59e0b;"></div><div style="width:11%;background:#06b6d4;"></div></div>
+        <span style="font-size:11px;font-weight:700;color:#059669;text-align:right;">57% &nbsp;&middot;&nbsp; Healthy</span>
+      </div>
+      <div style="display:grid;grid-template-columns:100px 52px 1fr 130px;align-items:center;gap:8px;padding:7px 0;">
+        <span style="font-size:12px;font-weight:600;color:var(--text-primary);">David Walsh</span>
+        <span style="font-size:11px;color:var(--text-tertiary);">12 tasks</span>
+        <div style="height:10px;background:var(--page-bg);border-radius:3px;overflow:hidden;display:flex;width:43%;"><div style="width:67%;background:#6366f1;"></div><div style="width:8%;background:#ef4444;"></div><div style="width:17%;background:#f59e0b;"></div><div style="width:8%;background:#06b6d4;"></div></div>
+        <span style="font-size:11px;font-weight:700;color:#059669;text-align:right;">38% &nbsp;&middot;&nbsp; Available</span>
+      </div>
+      <div class="chart-legend" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--card-border);"><div class="legend-item"><div class="swatch" style="background:#6366f1"></div>Standard work</div><div class="legend-item"><div class="swatch" style="background:#ef4444"></div>Escalations</div><div class="legend-item"><div class="swatch" style="background:#f59e0b"></div>Technical referrals</div><div class="legend-item"><div class="swatch" style="background:#06b6d4"></div>New claims</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>Quality indicators</h2><span class="card-head-meta">Last 7 days</span></div>
+    <div style="padding:14px 20px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div class="c-tile soon"><div class="c-val" style="color:#d97706;">2.1%</div><div class="c-lbl">Rework rate</div></div>
+        <div class="c-tile" style="background:var(--ok-bg);border-color:var(--ok-border);"><div class="c-val" style="color:#059669;">97%</div><div class="c-lbl">Approval rate</div></div>
+        <div class="c-tile"><div class="c-val">4%</div><div class="c-lbl">Referred to specialist</div></div>
+        <div class="c-tile"><div class="c-val">2</div><div class="c-lbl">Complaints</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>Week ahead</h2><span class="card-head-meta">Projected action volume by type</span></div>
+    <div style="padding:16px 20px;">
+      <div class="week-horiz">
+        <div class="wh-row"><span class="wh-day" style="color:var(--text-primary);">Wed</span><div class="wh-track"><div class="wh-seg" style="width:35%;background:#6366f1;"></div><div class="wh-seg" style="width:28%;background:#06b6d4;"></div><div class="wh-seg" style="width:22%;background:#f59e0b;"></div><div class="wh-seg" style="width:15%;background:#10b981;"></div></div><span class="wh-count">142</span></div>
+        <div class="wh-row"><span class="wh-day">Thu</span><div class="wh-track"><div class="wh-seg" style="width:32%;background:#6366f199;"></div><div class="wh-seg" style="width:25%;background:#06b6d499;"></div><div class="wh-seg" style="width:20%;background:#f59e0b99;"></div><div class="wh-seg" style="width:15%;background:#10b98199;"></div></div><span class="wh-count">131</span></div>
+        <div class="wh-row"><span class="wh-day">Fri</span><div class="wh-track"><div class="wh-seg" style="width:28%;background:#6366f199;"></div><div class="wh-seg" style="width:22%;background:#06b6d499;"></div><div class="wh-seg" style="width:18%;background:#f59e0b99;"></div><div class="wh-seg" style="width:10%;background:#10b98199;"></div></div><span class="wh-count">88</span></div>
+        <div class="wh-row"><span class="wh-day">Mon</span><div class="wh-track"><div class="wh-seg" style="width:30%;background:#6366f199;"></div><div class="wh-seg" style="width:24%;background:#06b6d499;"></div><div class="wh-seg" style="width:20%;background:#f59e0b99;"></div><div class="wh-seg" style="width:12%;background:#10b98199;"></div></div><span class="wh-count">98</span></div>
+        <div class="wh-row"><span class="wh-day">Tue</span><div class="wh-track"><div class="wh-seg" style="width:31%;background:#6366f199;"></div><div class="wh-seg" style="width:26%;background:#06b6d499;"></div><div class="wh-seg" style="width:19%;background:#f59e0b99;"></div><div class="wh-seg" style="width:11%;background:#10b98199;"></div></div><span class="wh-count">114</span></div>
+      </div>
+      <div class="chart-legend" style="margin-top:12px;"><div class="legend-item"><div class="swatch" style="background:#6366f1"></div>Approvals</div><div class="legend-item"><div class="swatch" style="background:#06b6d4"></div>Assessments</div><div class="legend-item"><div class="swatch" style="background:#f59e0b"></div>Verifications</div><div class="legend-item"><div class="swatch" style="background:#10b981"></div>Exceptions</div></div>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex;align-items:baseline;gap:10px;padding:8px 0 2px;"><h2 style="font-size:16px;font-weight:700;letter-spacing:-0.2px;color:var(--text-primary);">Agent analytics</h2><span style="font-size:11px;color:var(--text-tertiary);">Today</span></div>
+
+<div class="card">
+  <div class="ops-stat-strip">
+    <div class="ops-stat"><div class="ops-stat-label">Active agents</div><div class="ops-stat-value">12</div><div class="ops-stat-sub alert">3 idle &nbsp;&middot;&nbsp; 1 faulted</div></div>
+    <div class="ops-stat"><div class="ops-stat-label">Tasks completed today</div><div class="ops-stat-value">284</div><div class="ops-stat-sub ok">+18% vs yesterday</div></div>
+    <div class="ops-stat"><div class="ops-stat-label">Queue depth</div><div class="ops-stat-value watch">47</div><div class="ops-stat-sub">Investigation &amp; assessment</div></div>
+    <div class="ops-stat"><div class="ops-stat-label">SLAs at risk</div><div class="ops-stat-value alert">3</div><div class="ops-stat-sub alert">2 overdue &nbsp;&middot;&nbsp; 1 critical</div></div>
+    <div class="ops-stat"><div class="ops-stat-label">Agent capacity</div><div class="ops-stat-value watch">73%</div><div class="ops-stat-sub watch">2 agents degraded</div></div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+  <div class="card" style="grid-column:span 2;">
+    <div class="card-head"><div style="display:flex;align-items:center;gap:10px;"><h2>Agent performance</h2><span class="status-chip overdue">1 faulted</span></div><span class="card-head-meta">Today</span></div>
+    <div style="padding:16px 20px;">
+      <div style="display:grid;grid-template-columns:34px 140px 52px 1fr 160px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--card-border);">
+        <div class="agent-badge" style="background:#3b82f6;">DP</div>
+        <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Document processor</span>
+        <span style="font-size:11px;color:var(--text-tertiary);">147 tasks</span>
+        <div class="agent-perf-track"><div class="agent-perf-fill" style="width:78%;background:#2563eb;"></div></div>
+        <span style="font-size:11px;font-weight:700;color:#059669;text-align:right;">91% &nbsp;&middot;&nbsp; Healthy</span>
+      </div>
+      <div style="display:grid;grid-template-columns:34px 140px 52px 1fr 160px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--card-border);">
+        <div class="agent-badge" style="background:#d97706;">FD</div>
+        <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Fraud detection</span>
+        <span style="font-size:11px;color:var(--text-tertiary);">89 tasks</span>
+        <div class="agent-perf-track"><div class="agent-perf-fill" style="width:70%;background:#2563eb;"></div></div>
+        <span style="font-size:11px;font-weight:700;color:#059669;text-align:right;">88% &nbsp;&middot;&nbsp; Healthy</span>
+      </div>
+      <div style="display:grid;grid-template-columns:34px 140px 52px 1fr 160px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--card-border);">
+        <div class="agent-badge" style="background:#10b981;">SP</div>
+        <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Settlement processor</span>
+        <span style="font-size:11px;color:var(--text-tertiary);">31 tasks</span>
+        <div class="agent-perf-track"><div class="agent-perf-fill" style="width:38%;background:#d97706;"></div></div>
+        <span style="font-size:11px;font-weight:700;color:#d97706;text-align:right;">54% &nbsp;&middot;&nbsp; Degraded</span>
+      </div>
+      <div style="display:grid;grid-template-columns:34px 140px 52px 1fr 160px;align-items:center;gap:8px;padding:7px 0;">
+        <div class="agent-badge" style="background:#dc2626;">PV</div>
+        <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Policy validator</span>
+        <span style="font-size:11px;color:var(--text-tertiary);">0 tasks</span>
+        <div class="agent-perf-track"><div class="agent-perf-fill" style="width:5%;background:#dc2626;"></div></div>
+        <span style="font-size:11px;font-weight:700;color:#dc2626;text-align:right;">Faulted</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>Active alerts</h2></div>
+    <div style="padding:14px 20px;">
+      <div class="ops-alert watch"><div class="ops-alert-title">Settlement processor is making more errors than usual and may need attention</div><div class="ops-alert-sub">Since 2:45 am &nbsp;&middot;&nbsp; Some tasks may require manual review</div></div>
+      <div class="ops-alert alert"><div class="ops-alert-title">Policy validator has stopped working &mdash; 3 claims are on hold</div><div class="ops-alert-sub">Since 3:18 am &nbsp;&middot;&nbsp; Claims will not progress until this is resolved</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>Quality indicators</h2><span class="card-head-meta">This week</span></div>
+    <div style="padding:14px 20px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div class="c-tile soon"><div class="c-val" style="color:#d97706;">4.2%</div><div class="c-lbl">Rework rate</div></div>
+        <div class="c-tile" style="background:var(--ok-bg);border-color:var(--ok-border);"><div class="c-val" style="color:#059669;">87%</div><div class="c-lbl">Approval rate</div></div>
+        <div class="c-tile soon"><div class="c-val" style="color:#d97706;">11%</div><div class="c-lbl">Referral rate</div></div>
+        <div class="c-tile urgent"><div class="c-val" style="color:#dc2626;">2</div><div class="c-lbl">Complaints</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div></div>
+<!-- CLAIM DETAIL SCREEN -->
+<div class="screen" id="screen-claim-detail">
+<div style="padding:16px 24px 14px;border-bottom:1px solid var(--card-border);background:var(--nav-bg);flex-shrink:0;">
+<button onclick="showScreen('claims')" style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--text-secondary);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;margin-bottom:6px;"><span style="font-size:14px;">&#8592;</span> Claims</button>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+<div><div style="font-size:19px;font-weight:700;letter-spacing:-0.3px;color:var(--text-primary);margin-bottom:2px;">Motor #4821 &middot; Sarah Chen</div><div style="font-size:12px;color:var(--text-tertiary);">Wednesday 1 April 2026</div></div>
+</div></div>
+<div style="padding:12px 24px 14px;background:var(--card-bg);border-bottom:1px solid var(--card-border);flex-shrink:0;">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+<span class="status-chip overdue">Overdue</span><span class="flag fraud">Fraud</span><span class="flag legal">Legal</span>
+<span style="margin-left:8px;font-size:12px;color:var(--text-secondary);">2019 Mazda CX-5 Touring &nbsp;&middot;&nbsp; Policy MTR-2026-48219 &nbsp;&middot;&nbsp; Lodged 15 Mar 2026</span>
+</div>
+<div style="display:flex;gap:3px;align-items:stretch;">
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><div style="height:6px;background:#2563eb;border-radius:3px;"></div><div style="font-size:10px;color:var(--text-secondary);text-align:center;">Lodgement</div></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><div style="height:6px;background:#2563eb;border-radius:3px;"></div><div style="font-size:10px;color:var(--text-secondary);text-align:center;">Assessment</div></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><div style="height:6px;background:#2563eb;border-radius:3px;"></div><div style="font-size:10px;color:var(--text-secondary);text-align:center;">Liability</div></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><div style="height:6px;background:#2563eb;border-radius:3px;"></div><div style="font-size:10px;color:var(--text-secondary);text-align:center;">Repair auth</div></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><div style="height:6px;background:#2563eb;border-radius:3px;"></div><div style="font-size:10px;font-weight:700;color:#2563eb;text-align:center;">Settlement</div></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><div style="height:6px;background:var(--page-bg);border-radius:3px;"></div><div style="font-size:10px;color:var(--text-tertiary);text-align:center;">Recovery</div></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><div style="height:6px;background:var(--page-bg);border-radius:3px;"></div><div style="font-size:10px;color:var(--text-tertiary);text-align:center;">Closure</div></div>
+</div></div>
+<div style="display:flex;border-bottom:1px solid var(--card-border);background:var(--card-bg);padding:0 24px;flex-shrink:0;">
+<div class="cd-tab active" onclick="showClaimTab('snapshot',this)">Claim snapshot</div>
+<div class="cd-tab" onclick="showClaimTab('documents',this)">Documents</div>
+<div class="cd-tab" onclick="showClaimTab('timeline',this)">Tasks and actions</div>
+<div class="cd-tab" onclick="showClaimTab('stages',this)">Stages</div>
+</div>
+<div style="flex:1;overflow-y:auto;padding:20px 24px 40px;display:flex;flex-direction:column;gap:14px;" id="claim-tab-content">
+
+<div id="tab-snapshot">
+<div class="card"><div class="card-head"><h2>Critical details</h2></div>
+<div style="padding:16px 20px;">
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px 24px;">
+<div class="cd-field"><span class="cd-lbl">Excess amount</span><span class="cd-val">$750.00</span></div>
+<div class="cd-field"><span class="cd-lbl">Claim decision</span><span class="cd-val">Accept</span></div>
+<div class="cd-field"><span class="cd-lbl">Active investigation</span><span class="cd-val">No</span></div>
+<div class="cd-field"><span class="cd-lbl">Complaints</span><span class="cd-val">Total: 0 &middot; Active: 0</span></div>
+<div class="cd-field"><span class="cd-lbl">Balance remaining</span><span class="cd-val">$18,200.00</span></div>
+<div class="cd-field"><span class="cd-lbl">Prior claims</span><span class="cd-val">Yes &middot; 1 in 3 years</span></div>
+<div class="cd-field"><span class="cd-lbl">Vulnerability</span><span class="cd-val">No</span></div>
+<div class="cd-field"><span class="cd-lbl">Status</span><span class="cd-val">Open</span></div>
+<div class="cd-field"><span class="cd-lbl">Insured value</span><span class="cd-val">$28,400.00</span></div>
+<div class="cd-field"><span class="cd-lbl">Assessment required</span><span class="cd-val">Yes &middot; Desktop</span></div>
+<div class="cd-field"><span class="cd-lbl">Third party involved</span><span class="cd-val">Yes</span></div>
+<div class="cd-field"><span class="cd-lbl">Fraud referral</span><span class="cd-val" style="color:#dc2626;font-weight:600;">Yes &middot; Under review</span></div>
+</div></div></div>
+<div class="card"><div class="card-head"><h2>Special considerations</h2></div>
+<div style="padding:16px 20px;">
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0 1px;background:var(--card-border);border:1px solid var(--card-border);border-radius:var(--r-sm);overflow:hidden;margin-bottom:16px;">
+<div style="background:var(--card-bg);padding:10px 14px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-tertiary);margin-bottom:4px;">Total loss <span class="sparkle">&#10022;</span></div><div style="font-size:13px;font-weight:600;color:var(--text-primary);">Yes</div></div>
+<div style="background:var(--card-bg);padding:10px 14px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-tertiary);margin-bottom:4px;">Write-off category <span class="sparkle">&#10022;</span></div><div style="font-size:13px;font-weight:600;color:var(--text-primary);">Statutory write-off</div></div>
+<div style="background:var(--card-bg);padding:10px 14px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-tertiary);margin-bottom:4px;">Finance payout required <span class="sparkle">&#10022;</span></div><div style="font-size:13px;font-weight:600;color:var(--text-primary);">Yes &middot; $12,400</div></div>
+<div style="background:var(--card-bg);padding:10px 14px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-tertiary);margin-bottom:4px;">Non-claim damage <span class="sparkle">&#10022;</span></div><div style="font-size:13px;color:var(--text-secondary);">No</div></div>
+</div>
+<div style="background:var(--page-bg);border:1px solid var(--card-border);border-radius:var(--r-sm);padding:14px 16px;">
+<div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:12px;">Total loss settlement detail</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px 24px;">
+<div class="cd-field"><span class="cd-lbl">Market valuation <span class="sparkle">&#10022;</span></span><span class="cd-val">$28,400.00</span></div>
+<div class="cd-field"><span class="cd-lbl">Repair estimate</span><span class="cd-val">$31,250.00</span></div>
+<div class="cd-field"><span class="cd-lbl">Proposed settlement</span><span class="cd-val" style="font-weight:700;">$26,980.00</span></div>
+<div class="cd-field"><span class="cd-lbl">Salvage value</span><span class="cd-val">$1,670.00</span></div>
+<div class="cd-field"><span class="cd-lbl">Finance payout</span><span class="cd-val">$12,400.00</span></div>
+<div class="cd-field"><span class="cd-lbl">Amount to insured</span><span class="cd-val" style="font-weight:700;color:#2563eb;">$14,580.00</span></div>
+<div class="cd-field"><span class="cd-lbl">Fulfilment method</span><span class="cd-val">Cash settlement</span></div>
+<div class="cd-field"><span class="cd-lbl">PPSR checked</span><span class="cd-val">Yes &middot; 18 Mar 2026</span></div>
+<div class="cd-field"><span class="cd-lbl">Paid to date</span><span class="cd-val">$0.00</span></div>
+</div></div></div></div>
+<div class="card"><div class="card-head"><h2>Actions and events</h2><span style="font-size:11px;color:var(--text-tertiary);">Last customer contact: <strong style="color:var(--text-secondary);">22 Mar 2026</strong></span></div>
+<div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+<div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-tertiary);margin-bottom:8px;">Recent actions <span class="sparkle">&#10022;</span></div>
+<div style="display:flex;flex-direction:column;gap:6px;">
+<div class="ae-item">Market valuation completed by agent. Vehicle assessed as statutory write-off. Settlement calculation submitted for advisor approval.</div>
+<div class="ae-item">PPSR search completed. Finance payout amount confirmed with lender. Salvage assessment arranged with nominated salvage partner.</div>
+</div></div>
+<div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-tertiary);margin-bottom:8px;">Next actions <span class="sparkle">&#10022;</span></div>
+<div style="display:flex;flex-direction:column;gap:6px;">
+<div class="ae-item">Approve total loss settlement amount and authorise payment to financier and insured.</div>
+<div class="ae-item">Confirm salvage collection date with insured and salvage partner.</div>
+<div class="ae-item">Contact insured to confirm settlement acceptance and answer any questions on the proposed amount.</div>
+</div></div>
+</div></div>
+<div class="card"><div class="card-head"><h2>Payment history</h2></div>
+<div style="padding:16px 20px;">
+<div style="position:relative;padding-bottom:20px;margin-bottom:16px;">
+<div style="position:absolute;top:8px;left:0;right:0;height:2px;background:#e5e7eb;"></div>
+<div style="display:flex;justify-content:space-between;position:relative;">
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;max-width:160px;"><div style="width:14px;height:14px;border-radius:50%;background:#2563eb;border:2px solid #fff;box-shadow:0 0 0 1px #2563eb;flex-shrink:0;"></div><div><div style="font-size:11px;font-weight:700;color:var(--text-primary);">15 Mar 2026</div><div style="font-size:11px;color:var(--text-secondary);margin-top:2px;line-height:1.5;">$750.00 excess collected from insured</div></div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;max-width:160px;"><div style="width:14px;height:14px;border-radius:50%;background:#2563eb;border:2px solid #fff;box-shadow:0 0 0 1px #2563eb;flex-shrink:0;"></div><div><div style="font-size:11px;font-weight:700;color:var(--text-primary);">21 Mar 2026</div><div style="font-size:11px;color:var(--text-secondary);margin-top:2px;line-height:1.5;">$320.00 paid to McCarthy Panel for assessment</div></div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;max-width:160px;"><div style="width:14px;height:14px;border-radius:50%;background:#2563eb;border:2px solid #fff;box-shadow:0 0 0 1px #2563eb;flex-shrink:0;"></div><div><div style="font-size:11px;font-weight:700;color:var(--text-primary);">25 Mar 2026</div><div style="font-size:11px;color:var(--text-secondary);margin-top:2px;line-height:1.5;">$185.00 paid to valuation provider</div></div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;max-width:160px;opacity:0.45;"><div style="width:14px;height:14px;border-radius:50%;background:#9ca3af;border:2px solid #fff;box-shadow:0 0 0 1px #9ca3af;flex-shrink:0;"></div><div><div style="font-size:11px;font-weight:700;color:var(--text-primary);">Pending approval</div><div style="font-size:11px;color:var(--text-secondary);margin-top:2px;line-height:1.5;">$12,400.00 to financier + $14,580.00 to insured</div></div></div>
+</div></div>
+<div style="display:flex;gap:8px;">
+<div style="flex:1;padding:10px 12px;background:var(--page-bg);border:1px solid var(--card-border);border-radius:var(--r-sm);text-align:center;"><div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px;">Paid to date</div><div style="font-size:18px;font-weight:700;color:var(--text-primary);">$1,255.00</div></div>
+<div style="flex:1;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--r-sm);text-align:center;"><div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px;">Pending</div><div style="font-size:18px;font-weight:700;color:#2563eb;">$26,980.00</div></div>
+<div style="flex:1;padding:10px 12px;background:var(--page-bg);border:1px solid var(--card-border);border-radius:var(--r-sm);text-align:center;"><div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px;">Total exposure</div><div style="font-size:18px;font-weight:700;color:var(--text-primary);">$28,235.00</div></div>
+</div></div></div>
+</div>
+
+<div id="tab-documents" style="display:none;">
+<div class="card"><div class="card-head"><h2>Documents</h2></div>
+<table class="claims-table">
+<thead><tr><th>Document</th><th>Type</th><th>Added by</th><th>Date</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td style="font-weight:600;">Market valuation report</td><td><span style="font-size:11px;color:var(--text-secondary);">Valuation</span></td><td><span style="font-size:11px;">Agent</span></td><td><span style="font-size:11px;">25 Mar 2026</span></td><td><span class="status-chip upcoming">Received</span></td></tr>
+<tr><td style="font-weight:600;">Repair assessment, McCarthy Panel</td><td><span style="font-size:11px;color:var(--text-secondary);">Assessment</span></td><td><span style="font-size:11px;">Agent</span></td><td><span style="font-size:11px;">21 Mar 2026</span></td><td><span class="status-chip upcoming">Received</span></td></tr>
+<tr><td style="font-weight:600;">PPSR search result</td><td><span style="font-size:11px;color:var(--text-secondary);">Search</span></td><td><span style="font-size:11px;">Agent</span></td><td><span style="font-size:11px;">18 Mar 2026</span></td><td><span class="status-chip upcoming">Received</span></td></tr>
+<tr><td style="font-weight:600;">Claim lodgement form</td><td><span style="font-size:11px;color:var(--text-secondary);">Lodgement</span></td><td><span style="font-size:11px;">Customer</span></td><td><span style="font-size:11px;">15 Mar 2026</span></td><td><span class="status-chip upcoming">Received</span></td></tr>
+<tr><td style="font-weight:600;">Police report, event no. E2026-4821</td><td><span style="font-size:11px;color:var(--text-secondary);">Police report</span></td><td><span style="font-size:11px;">Customer</span></td><td><span style="font-size:11px;">15 Mar 2026</span></td><td><span class="status-chip upcoming">Received</span></td></tr>
+<tr><td style="font-weight:600;color:#d97706;">Finance payout confirmation letter</td><td><span style="font-size:11px;color:var(--text-secondary);">Finance</span></td><td><span style="font-size:11px;">Agent</span></td><td><span style="font-size:11px;">28 Mar 2026</span></td><td><span class="status-chip due-today">Pending</span></td></tr>
+<tr><td style="font-weight:600;color:#dc2626;">Fraud referral documentation</td><td><span style="font-size:11px;color:var(--text-secondary);">Fraud</span></td><td><span style="font-size:11px;">Agent</span></td><td><span style="font-size:11px;">20 Mar 2026</span></td><td><span class="status-chip overdue">Under review</span></td></tr>
+</tbody></table></div>
+</div>
+
+<div id="tab-timeline" style="display:none;">
+<div class="card"><div class="card-head"><h2>Tasks and actions</h2>
+<div style="display:flex;gap:6px;"><span class="tl-filter-btn active">All</span><span class="tl-filter-btn">Agent</span><span class="tl-filter-btn">Human</span></div></div>
+<div style="padding:16px 20px;display:flex;flex-direction:column;gap:0;position:relative;">
+<div style="position:absolute;left:31px;top:24px;bottom:24px;width:2px;background:var(--card-border);"></div>
+<div class="tl-entry"><div class="tl-dot human">JC</div><div class="tl-body"><div class="tl-meta">30 Mar 2026 &middot; 9:14 am &middot; J. Chen</div><div class="tl-text">Reviewed settlement calculation. Returned to agent to confirm salvage collection arrangements before approving payment.</div></div></div>
+<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">28 Mar 2026 &middot; 2:30 pm &middot; Agent</div><div class="tl-text">Settlement calculation completed. Proposed amount $26,980.00 based on market valuation less excess and salvage value. Finance payout of $12,400.00 confirmed with lender. Escalated to advisor for approval.</div></div></div>
+<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">25 Mar 2026 &middot; 11:05 am &middot; Agent</div><div class="tl-text">Market valuation retrieved from approved valuation provider. Vehicle value confirmed at $28,400.00. Statutory write-off status confirmed.</div></div></div>
+<div class="tl-entry"><div class="tl-dot human">JC</div><div class="tl-body"><div class="tl-meta">22 Mar 2026 &middot; 3:15 pm &middot; J. Chen</div><div class="tl-text">Contacted insured to advise total loss outcome and explain the settlement process. Insured requested time to consider. Follow-up scheduled for 27 March.</div></div></div>
+<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">21 Mar 2026 &middot; 9:00 am &middot; Agent</div><div class="tl-text">Repair assessment received. Repair cost estimate $31,250.00 exceeds vehicle value. Total loss determination triggered. PPSR search completed, one encumbrance found, finance payout required.</div></div></div>
+<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">18 Mar 2026 &middot; 4:45 pm &middot; Agent</div><div class="tl-text">Fraud referral submitted based on inconsistencies in incident description and prior claim history. Under review by investigations team.</div></div></div>
+<div class="tl-entry"><div class="tl-dot human">JC</div><div class="tl-body"><div class="tl-meta">16 Mar 2026 &middot; 10:20 am &middot; J. Chen</div><div class="tl-text">Liability assessment completed. Insured not at fault. Third-party recovery flagged for post-settlement action.</div></div></div>
+<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">15 Mar 2026 &middot; 8:55 am &middot; Agent</div><div class="tl-text">Claim lodged. Cover verified. Policy active at time of incident. Repair assessment arranged with McCarthy Panel, Artarmon.</div></div></div>
+</div></div></div>
+
+<div id="tab-stages" style="display:none;">
+<div class="card"><div class="card-head"><h2>Claim stages</h2></div>
+<div style="padding:20px;"><div style="display:flex;flex-direction:column;gap:0;">
+<div style="display:flex;gap:0;"><div style="display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0;"><div style="width:20px;height:20px;border-radius:50%;background:#2563eb;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">&#10003;</div><div style="width:2px;flex:1;background:#2563eb;min-height:40px;"></div></div><div style="padding:0 0 24px 14px;flex:1;"><div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:2px;">Lodgement</div><div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;">Completed 15 Mar 2026</div><div style="font-size:12px;color:var(--text-secondary);">Claim received and cover verified. Policy active at time of incident. Incident details recorded and repair assessment arranged.</div></div></div>
+<div style="display:flex;gap:0;"><div style="display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0;"><div style="width:20px;height:20px;border-radius:50%;background:#2563eb;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">&#10003;</div><div style="width:2px;flex:1;background:#2563eb;min-height:40px;"></div></div><div style="padding:0 0 24px 14px;flex:1;"><div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:2px;">Assessment</div><div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;">Completed 21 Mar 2026</div><div style="font-size:12px;color:var(--text-secondary);">Repair assessment completed by McCarthy Panel. Repair estimate $31,250.00 exceeds market value. Total loss determination made. PPSR search completed, one encumbrance found.</div></div></div>
+<div style="display:flex;gap:0;"><div style="display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0;"><div style="width:20px;height:20px;border-radius:50%;background:#2563eb;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">&#10003;</div><div style="width:2px;flex:1;background:#2563eb;min-height:40px;"></div></div><div style="padding:0 0 24px 14px;flex:1;"><div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:2px;">Liability</div><div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;">Completed 16 Mar 2026</div><div style="font-size:12px;color:var(--text-secondary);">Liability assessment completed. Insured determined not at fault. Third-party recovery flagged for post-settlement action.</div></div></div>
+<div style="display:flex;gap:0;"><div style="display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0;"><div style="width:20px;height:20px;border-radius:50%;background:#2563eb;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">&#10003;</div><div style="width:2px;flex:1;background:#2563eb;min-height:40px;"></div></div><div style="padding:0 0 24px 14px;flex:1;"><div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:2px;">Repair auth</div><div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;">Completed 21 Mar 2026</div><div style="font-size:12px;color:var(--text-secondary);">Total loss confirmed. Repair authorisation not applicable. Salvage assessment arranged and statutory write-off recorded.</div></div></div>
+<div style="display:flex;gap:0;"><div style="display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0;"><div style="width:22px;height:22px;border-radius:50%;background:#2563eb;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;box-shadow:0 0 0 3px #bfdbfe;">5</div><div style="width:2px;flex:1;background:var(--page-bg);min-height:40px;"></div></div><div style="padding:0 0 24px 14px;flex:1;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;"><span style="font-size:13px;font-weight:700;color:#2563eb;">Settlement</span><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:9999px;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;">Current stage</span><span class="status-chip overdue">Overdue 3d</span></div><div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;">In progress since 28 Mar 2026</div><div style="font-size:12px;color:var(--text-secondary);">Settlement calculation completed by agent. Proposed amount $26,980.00 pending advisor approval. Finance payout of $12,400.00 confirmed with lender. Awaiting approval to release payment.</div></div></div>
+<div style="display:flex;gap:0;"><div style="display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0;"><div style="width:20px;height:20px;border-radius:50%;background:var(--page-bg);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--text-tertiary);">6</div><div style="width:2px;flex:1;background:var(--page-bg);min-height:40px;"></div></div><div style="padding:0 0 24px 14px;flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text-tertiary);margin-bottom:2px;">Recovery</div><div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;">Not started</div><div style="font-size:12px;color:var(--text-tertiary);">Third-party recovery action to be initiated following settlement. Insured not at fault.</div></div></div>
+<div style="display:flex;gap:0;"><div style="display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0;"><div style="width:20px;height:20px;border-radius:50%;background:var(--page-bg);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--text-tertiary);">7</div></div><div style="padding:0 0 0 14px;flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text-tertiary);margin-bottom:2px;">Closure</div><div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;">Not started</div><div style="font-size:12px;color:var(--text-tertiary);">Claim to be closed once all payments confirmed and recovery actions resolved.</div></div></div>
+</div></div></div></div>
+
+</div>
+</div>
+</div></div></div>
+
+<script>
+  const titles = { home: 'Home', actions: 'Actions', claims: 'Claims', operations: 'Operations' };
+  let currentHomeVariant = 'member';
+
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('main-page-head').style.display = '';
+    if (name === 'home') {
+      document.getElementById('screen-home-' + currentHomeVariant).classList.add('active');
+    } else {
+      document.getElementById('screen-' + name).classList.add('active');
+    }
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    const order = ['home', 'actions', 'claims', 'operations'];
+    const idx = order.indexOf(name);
+    if (idx >= 0) document.querySelectorAll('.nav-link')[idx].classList.add('active');
+    document.getElementById('page-title').textContent = titles[name] || name.charAt(0).toUpperCase() + name.slice(1);
+    
+  }
+
+
+
+  function showClaimDetail(claimId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-claim-detail').classList.add('active');
+    document.getElementById('main-page-head').style.display = 'none';
+  }
+
+  function showClaimTab(tab, btn) {
+    ['snapshot','documents','timeline','stages'].forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      el.style.display = t === tab ? 'flex' : 'none';
+      if (t === tab) el.style.flexDirection = 'column';
+    });
+    document.querySelectorAll('.cd-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
