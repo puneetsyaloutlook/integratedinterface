@@ -53,6 +53,57 @@
   .feedback-btn { padding: 5px 12px; font-size: 12px; font-weight: 500; color: var(--text-secondary); border: 1px solid var(--card-border); border-radius: var(--r-sm); background: none; cursor: pointer; white-space: nowrap; font-family: inherit; }
   .feedback-btn:hover { background: var(--page-bg); }
   .profile-divider { width: 1px; height: 20px; background: var(--card-border); }
+
+  /* Feedback panel */
+  .feedback-panel {
+    display: none;
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 380px;
+    background: var(--card-bg);
+    border-left: 1px solid var(--card-border);
+    box-shadow: -4px 0 16px rgba(0,0,0,0.08);
+    z-index: 100;
+    flex-direction: column;
+  }
+  .feedback-panel.open { display: flex; }
+  .fb-panel-head { padding: 16px 20px 14px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .fb-panel-head h2 { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .fb-close-btn { width: 28px; height: 28px; border: none; background: none; cursor: pointer; color: var(--text-tertiary); font-size: 18px; display: flex; align-items: center; justify-content: center; border-radius: var(--r-sm); }
+  .fb-close-btn:hover { background: var(--page-bg); color: var(--text-primary); }
+  .fb-tabs { display: flex; border-bottom: 1px solid var(--card-border); padding: 0 20px; flex-shrink: 0; }
+  .fb-tab { padding: 9px 12px; font-size: 12px; font-weight: 500; color: var(--text-tertiary); border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px; user-select: none; }
+  .fb-tab.active { color: var(--text-primary); font-weight: 700; border-bottom-color: var(--text-primary); }
+  .fb-body { flex: 1; overflow-y: auto; padding: 18px 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .fb-section-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-tertiary); margin-bottom: 6px; }
+  .fb-change-link { font-size: 11px; color: #2563eb; cursor: pointer; margin-top: 5px; display: inline-block; }
+  .fb-element-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+  .fb-element-btn { padding: 7px 10px; font-size: 11px; font-weight: 500; color: var(--text-secondary); background: var(--page-bg); border: 1px solid var(--card-border); border-radius: var(--r-sm); cursor: pointer; text-align: left; font-family: inherit; transition: border-color 0.1s, background 0.1s; }
+  .fb-element-btn:hover { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+  .fb-element-btn.selected { border-color: #2563eb; background: #eff6ff; color: #2563eb; font-weight: 600; }
+  .fb-question { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.5; }
+  .fb-response-row { display: flex; gap: 6px; }
+  .fb-response-btn { flex: 1; padding: 9px 6px; font-size: 12px; font-weight: 500; color: var(--text-secondary); background: var(--page-bg); border: 1px solid var(--card-border); border-radius: var(--r-sm); cursor: pointer; text-align: center; font-family: inherit; transition: border-color 0.1s, background 0.1s; }
+  .fb-response-btn:hover { border-color: #2563eb; background: #eff6ff; }
+  .fb-response-btn.selected { border-color: #2563eb; background: #eff6ff; color: #2563eb; font-weight: 700; }
+  .fb-reason-list { display: flex; flex-direction: column; gap: 5px; }
+  .fb-reason-btn { padding: 7px 10px; font-size: 11px; font-weight: 500; color: var(--text-secondary); background: var(--page-bg); border: 1px solid var(--card-border); border-radius: var(--r-sm); cursor: pointer; text-align: left; font-family: inherit; transition: border-color 0.1s, background 0.1s; }
+  .fb-reason-btn:hover { border-color: #2563eb; background: #eff6ff; }
+  .fb-reason-btn.selected { border-color: #2563eb; background: #eff6ff; color: #2563eb; font-weight: 600; }
+  .fb-textarea { width: 100%; padding: 8px 10px; font-size: 12px; font-family: inherit; color: var(--text-primary); background: var(--page-bg); border: 1px solid var(--card-border); border-radius: var(--r-sm); resize: vertical; min-height: 72px; box-sizing: border-box; }
+  .fb-textarea:focus { outline: none; border-color: #2563eb; }
+  .fb-char-count { font-size: 10px; color: var(--text-tertiary); text-align: right; margin-top: 3px; }
+  .fb-submit-btn { width: 100%; padding: 9px; font-size: 13px; font-weight: 600; color: #fff; background: #1a1f2e; border: none; border-radius: var(--r-sm); cursor: pointer; font-family: inherit; }
+  .fb-submit-btn:hover { background: #2d3549; }
+  .fb-submit-btn:disabled { background: var(--card-border); color: var(--text-tertiary); cursor: not-allowed; }
+  .fb-history-item { padding: 10px 12px; background: var(--page-bg); border-radius: var(--r-sm); border: 1px solid var(--card-border); }
+  .fb-history-meta { font-size: 10px; color: var(--text-tertiary); margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
+  .fb-history-context { font-size: 11px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+  .fb-history-response { font-size: 11px; color: var(--text-secondary); }
+  .fb-reviewed-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 9999px; background: var(--ok-bg); color: #059669; border: 1px solid var(--ok-border); }
+  .fb-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; border-radius: 9999px; background: #dc2626; color: #fff; font-size: 9px; font-weight: 700; padding: 0 4px; margin-left: 4px; vertical-align: middle; }
+  .fb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.15); z-index: 99; }
+  .fb-overlay.open { display: block; }
   .toggle-btn { padding: 5px 14px; font-size: 12px; font-weight: 500; color: var(--text-secondary); background: var(--nav-bg); cursor: pointer; user-select: none; }
   .toggle-btn.active { background: #1a1f2e; color: #fff; font-weight: 600; }
   .screen { display: none; flex: 1; overflow-y: auto; }
@@ -302,6 +353,11 @@
   .ops-alert:last-child { margin-bottom: 0; }
   .ops-alert-title { font-weight: 600; }
   .ops-alert-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+  .ops-alert-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .ops-alert-status { font-size: 10px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+  .ops-alert-status .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .ops-alert-btn { font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: var(--r-sm); border: 1px solid var(--card-border); background: var(--card-bg); cursor: pointer; font-family: inherit; color: var(--text-secondary); }
+  .ops-alert-btn:hover { background: var(--page-bg); }
   .adv-load-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--card-border); }
   .adv-load-row:last-child { border-bottom: none; }
   .adv-name { font-size: 12px; font-weight: 600; color: var(--text-primary); min-width: 96px; }
@@ -315,6 +371,20 @@
   .ops-qi-val { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text-primary); }
   .ops-qi-val.alert { color: #dc2626; } .ops-qi-val.watch { color: #d97706; }
   .ops-qi-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+  .ops-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (min-width: 1200px) {
+    .ops-card-grid { grid-template-columns: repeat(3, 1fr); }
+    .ops-card-grid .ops-span-first { grid-column: span 1; }
+  }
+  @media (min-width: 720px) and (max-width: 1199px) {
+    .ops-card-grid { grid-template-columns: 1fr 1fr; }
+    .ops-card-grid .ops-span-first { grid-column: span 2; }
+  }
+  @media (max-width: 719px) {
+    .ops-card-grid { grid-template-columns: 1fr; }
+    .ops-card-grid .ops-span-first { grid-column: span 1; }
+    .ops-card-grid .card[style*="grid-column:span 2"] { grid-column: span 1; }
+  }
   /* ── Claim detail ── */
   .cd-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-tertiary); border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px; user-select: none; }
   .cd-tab.active { color: var(--text-primary); font-weight: 700; border-bottom-color: var(--text-primary); }
@@ -356,7 +426,7 @@
       <button class="profile-icon-btn" title="Settings">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h12M2 12h12"/><circle cx="5" cy="4" r="1.5" fill="white"/><circle cx="10" cy="8" r="1.5" fill="white"/><circle cx="6" cy="12" r="1.5" fill="white"/></svg>
       </button>
-      <button class="feedback-btn">Give feedback</button>
+      <button class="feedback-btn" onclick="openFeedback()" id="feedback-trigger-btn">Give feedback</button>
     </div>
   </div>
 </div>
@@ -554,8 +624,8 @@
   </div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-  <div class="card" style="grid-column:span 2;">
+<div class="ops-card-grid">
+  <div class="card ops-span-first">
     <div class="card-head">
       <div style="display:flex;align-items:center;gap:10px;">
         <h2>Team performance</h2>
@@ -629,7 +699,76 @@
   </div>
 </div>
 
-<div style="display:flex;align-items:baseline;gap:10px;padding:8px 0 2px;"><h2 style="font-size:16px;font-weight:700;letter-spacing:-0.2px;color:var(--text-primary);">Agent analytics</h2><span style="font-size:11px;color:var(--text-tertiary);">Today</span></div>
+<div class="card">
+  <div class="card-head">
+    <h2>User feedback</h2>
+    <span class="card-head-meta">Last 7 days &nbsp;&middot;&nbsp; 23 submissions</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+    <div style="padding:16px 20px;border-right:1px solid var(--card-border);">
+      <div class="fb-section-lbl" style="margin-bottom:10px;">Response breakdown</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="flex:1;height:12px;background:var(--page-bg);border-radius:6px;overflow:hidden;display:flex;">
+          <div style="width:52%;background:#059669;"></div>
+          <div style="width:30%;background:#d97706;"></div>
+          <div style="width:18%;background:#dc2626;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-secondary);"><div style="width:10px;height:10px;border-radius:2px;background:#059669;flex-shrink:0;"></div>Yes &nbsp;<strong>52%</strong></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-secondary);"><div style="width:10px;height:10px;border-radius:2px;background:#d97706;flex-shrink:0;"></div>Partly &nbsp;<strong>30%</strong></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-secondary);"><div style="width:10px;height:10px;border-radius:2px;background:#dc2626;flex-shrink:0;"></div>No &nbsp;<strong>18%</strong></div>
+      </div>
+      <div class="fb-section-lbl" style="margin-bottom:8px;">By screen</div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <div style="display:grid;grid-template-columns:1fr 32px;align-items:center;gap:8px;font-size:11px;"><span style="color:var(--text-secondary);">Actions</span><span style="font-weight:700;color:var(--text-primary);text-align:right;">9</span></div>
+        <div style="display:grid;grid-template-columns:1fr 32px;align-items:center;gap:8px;font-size:11px;"><span style="color:var(--text-secondary);">Claims</span><span style="font-weight:700;color:var(--text-primary);text-align:right;">6</span></div>
+        <div style="display:grid;grid-template-columns:1fr 32px;align-items:center;gap:8px;font-size:11px;"><span style="color:var(--text-secondary);">Operations</span><span style="font-weight:700;color:var(--text-primary);text-align:right;">5</span></div>
+        <div style="display:grid;grid-template-columns:1fr 32px;align-items:center;gap:8px;font-size:11px;"><span style="color:var(--text-secondary);">Home</span><span style="font-weight:700;color:var(--text-primary);text-align:right;">3</span></div>
+      </div>
+    </div>
+    <div style="padding:16px 20px;">
+      <div class="fb-section-lbl" style="margin-bottom:8px;">Top reason codes</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:grid;grid-template-columns:1fr 28px;align-items:center;gap:8px;">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-primary);">Information was incomplete</div>
+            <div style="height:5px;background:var(--page-bg);border-radius:3px;overflow:hidden;margin-top:3px;"><div style="width:70%;height:100%;background:#d97706;border-radius:3px;"></div></div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-align:right;">7</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 28px;align-items:center;gap:8px;">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-primary);">AI recommendation appeared incorrect</div>
+            <div style="height:5px;background:var(--page-bg);border-radius:3px;overflow:hidden;margin-top:3px;"><div style="width:50%;height:100%;background:#d97706;border-radius:3px;"></div></div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-align:right;">5</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 28px;align-items:center;gap:8px;">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-primary);">Missing context for the decision</div>
+            <div style="height:5px;background:var(--page-bg);border-radius:3px;overflow:hidden;margin-top:3px;"><div style="width:30%;height:100%;background:#d97706;border-radius:3px;"></div></div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-align:right;">3</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 28px;align-items:center;gap:8px;">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-primary);">Customer circumstance not reflected</div>
+            <div style="height:5px;background:var(--page-bg);border-radius:3px;overflow:hidden;margin-top:3px;"><div style="width:20%;height:100%;background:#d97706;border-radius:3px;"></div></div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:var(--text-secondary);text-align:right;">2</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--card-border);">
+        <div class="fb-section-lbl" style="margin-bottom:6px;">Awaiting review</div>
+        <div style="font-size:22px;font-weight:700;letter-spacing:-1px;color:#d97706;">4</div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">submissions not yet acknowledged</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex;align-items:center;gap:10px;padding:8px 0 2px;"><h2 style="font-size:16px;font-weight:700;letter-spacing:-0.2px;color:var(--text-primary);">Agent analytics</h2><select class="field-select" style="width:auto;font-size:11px;padding:3px 24px 3px 8px;"><option>Today</option><option>Last 7 days</option><option>Last 14 days</option><option>Last 30 days</option><option>This month</option></select></div>
 
 <div class="card">
   <div class="ops-stat-strip">
@@ -641,8 +780,8 @@
   </div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-  <div class="card" style="grid-column:span 2;">
+<div class="ops-card-grid">
+  <div class="card ops-span-first">
     <div class="card-head"><div style="display:flex;align-items:center;gap:10px;"><h2>Agent performance</h2><span class="status-chip overdue">1 faulted</span></div><span class="card-head-meta">Today</span></div>
     <div style="padding:16px 20px;">
       <div style="display:grid;grid-template-columns:34px 140px 52px 1fr 160px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--card-border);">
@@ -678,18 +817,48 @@
   <div class="card">
     <div class="card-head"><h2>Active alerts</h2></div>
     <div style="padding:14px 20px;">
-      <div class="ops-alert watch"><div class="ops-alert-title">Settlement processor is making more errors than usual and may need attention</div><div class="ops-alert-sub">Since 2:45 am &nbsp;&middot;&nbsp; Some tasks may require manual review</div></div>
-      <div class="ops-alert alert"><div class="ops-alert-title">Policy validator has stopped working &mdash; 3 claims are on hold</div><div class="ops-alert-sub">Since 3:18 am &nbsp;&middot;&nbsp; Claims will not progress until this is resolved</div></div>
+      <div class="ops-alert watch">
+        <div class="ops-alert-title">Settlement processor is making more errors than usual and may need attention</div>
+        <div class="ops-alert-sub">Since 2:45 am &nbsp;&middot;&nbsp; Some tasks may require manual review</div>
+        <div class="ops-alert-foot">
+          <span class="ops-alert-status" style="color:#d97706;"><span class="dot" style="background:#d97706;"></span>Being looked into</span>
+          <button class="ops-alert-btn">View details</button>
+        </div>
+      </div>
+      <div class="ops-alert alert">
+        <div class="ops-alert-title">Policy validator has stopped working &mdash; 3 claims are on hold</div>
+        <div class="ops-alert-sub">Since 3:18 am &nbsp;&middot;&nbsp; Claims will not progress until this is resolved</div>
+        <div class="ops-alert-foot">
+          <span class="ops-alert-status" style="color:#dc2626;"><span class="dot" style="background:#dc2626;"></span>Not yet assigned</span>
+          <button class="ops-alert-btn">View details</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="card">
-    <div class="card-head"><h2>Quality indicators</h2><span class="card-head-meta">This week</span></div>
+    <div class="card-head"><h2>Agent quality indicators</h2><span class="card-head-meta">This week</span></div>
     <div style="padding:14px 20px;">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-        <div class="c-tile soon"><div class="c-val" style="color:#d97706;">4.2%</div><div class="c-lbl">Rework rate</div></div>
-        <div class="c-tile" style="background:var(--ok-bg);border-color:var(--ok-border);"><div class="c-val" style="color:#059669;">87%</div><div class="c-lbl">Approval rate</div></div>
-        <div class="c-tile soon"><div class="c-val" style="color:#d97706;">11%</div><div class="c-lbl">Referral rate</div></div>
-        <div class="c-tile urgent"><div class="c-val" style="color:#dc2626;">2</div><div class="c-lbl">Complaints</div></div>
+        <div class="c-tile" style="background:var(--ok-bg);border-color:var(--ok-border);">
+          <div class="c-val" style="color:#059669;">94%</div>
+          <div class="c-lbl">Task accuracy</div>
+          <div style="font-size:10px;color:var(--text-tertiary);margin-top:5px;line-height:1.4;">Output accepted without correction</div>
+        </div>
+        <div class="c-tile" style="background:var(--ok-bg);border-color:var(--ok-border);">
+          <div class="c-val" style="color:#059669;">1.8m</div>
+          <div class="c-lbl">Avg processing time</div>
+          <div style="font-size:10px;color:var(--text-tertiary);margin-top:5px;line-height:1.4;">Longer times can signal the agent is struggling</div>
+        </div>
+        <div class="c-tile soon">
+          <div class="c-val" style="color:#d97706;">11%</div>
+          <div class="c-lbl">Escalation rate</div>
+          <div style="font-size:10px;color:var(--text-tertiary);margin-top:5px;line-height:1.4;">Tasks passed to your team because the agent could not complete them</div>
+        </div>
+        <div class="c-tile soon">
+          <div class="c-val" style="color:#d97706;">4%</div>
+          <div class="c-lbl">Retry rate</div>
+          <div style="font-size:10px;color:var(--text-tertiary);margin-top:5px;line-height:1.4;">Tasks that had to be rerun after an error</div>
+        </div>
       </div>
     </div>
   </div>
@@ -840,8 +1009,307 @@
 </div>
 </div></div></div>
 
+
+<!-- Feedback overlay -->
+<div class="fb-overlay" id="fb-overlay" onclick="closeFeedback()"></div>
+
+<!-- Feedback panel -->
+<div class="feedback-panel" id="feedback-panel">
+  <div class="fb-panel-head">
+    <h2>Give feedback</h2>
+    <button class="fb-close-btn" onclick="closeFeedback()">&#x2715;</button>
+  </div>
+  <div class="fb-tabs">
+    <div class="fb-tab active" onclick="switchFbTab('new',this)">New feedback</div>
+    <div class="fb-tab" onclick="switchFbTab('history',this)">My previous feedback</div>
+  </div>
+
+  <!-- New feedback tab -->
+  <div id="fb-tab-new" class="fb-body">
+
+    <!-- Context -->
+    <div>
+      <div class="fb-section-lbl">You are looking at</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <span id="fb-context-label" style="font-size:12px;font-weight:600;color:var(--text-primary);">Home</span>
+        <span class="fb-change-link" id="fb-change-link" onclick="toggleContextChange()">Change &rsaquo;</span>
+      </div>
+      <div id="fb-context-change" style="display:none;margin-top:6px;">
+        <select class="field-select" id="fb-context-select" onchange="updateContextFromSelect()">
+          <option value="home">Home</option>
+          <option value="actions">Actions queue</option>
+          <option value="actions-item">Actions — Approve total loss determination (Motor #4821)</option>
+          <option value="claims">Claims list</option>
+          <option value="claims-detail">Motor #4821 — Claim snapshot</option>
+          <option value="operations-team">Operations — Team analytics</option>
+          <option value="operations-agent">Operations — Agent analytics</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Element targeting -->
+    <div id="fb-element-section">
+      <div class="fb-section-lbl">What specifically are you referring to? <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+      <div class="fb-element-grid" id="fb-element-grid"></div>
+    </div>
+
+    <!-- Question -->
+    <div>
+      <div class="fb-section-lbl">Your feedback</div>
+      <div class="fb-question" id="fb-question">Does this screen give you a useful start to your day?</div>
+    </div>
+
+    <!-- Response buttons -->
+    <div>
+      <div class="fb-response-row">
+        <button class="fb-response-btn" onclick="selectResponse('yes',this)">Yes</button>
+        <button class="fb-response-btn" onclick="selectResponse('partly',this)">Partly</button>
+        <button class="fb-response-btn" onclick="selectResponse('no',this)">No</button>
+      </div>
+    </div>
+
+    <!-- Reasons (shown on Partly/No) -->
+    <div id="fb-reasons-section" style="display:none;">
+      <div class="fb-section-lbl">What's the issue?</div>
+      <div class="fb-reason-list" id="fb-reason-list"></div>
+    </div>
+
+    <!-- Free text -->
+    <div id="fb-freetext-section">
+      <div class="fb-section-lbl" id="fb-freetext-lbl">Anything else worth noting?</div>
+      <textarea class="fb-textarea" id="fb-freetext" maxlength="500" placeholder="Optional" oninput="updateCharCount()"></textarea>
+      <div class="fb-char-count"><span id="fb-char-count">0</span> / 500</div>
+    </div>
+
+    <!-- Submit -->
+    <div>
+      <button class="fb-submit-btn" id="fb-submit-btn" onclick="submitFeedback()" disabled>Submit feedback</button>
+    </div>
+
+  </div>
+
+  <!-- History tab -->
+  <div id="fb-tab-history" class="fb-body" style="display:none;">
+    <div id="fb-history-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+</div>
+
 <script>
-  const titles = { home: 'Home', actions: 'Actions', claims: 'Claims', operations: 'Operations' };
+
+  // ── Feedback panel ──
+  const fbContextMap = {
+    home: { label: 'Home', question: 'Does this screen give you a useful start to your day?', elements: [] },
+    actions: { label: 'Actions queue', question: 'Is the information in your actions queue clear and useful?', elements: ['Overdue actions','Due today','Upcoming actions','Action detail'] },
+    'actions-item': { label: 'Approve total loss determination — Motor #4821', question: 'Did the information provided help you make this decision?', elements: ['Action summary','Supporting documents','Claim context','Decision panel'] },
+    claims: { label: 'Claims list', question: 'Is this screen giving you what you need?', elements: ['Task metrics','Portfolio health','Escalation pattern','Predicted load','Claims by stage','Claims table'] },
+    'claims-detail': { label: 'Motor #4821 — Claim snapshot', question: 'Is the information on this claim clear and complete?', elements: ['Critical details','Special considerations','Actions and events','Payment history'] },
+    'operations-team': { label: 'Operations — Team analytics', question: 'Is the team analytics section giving you what you need?', elements: ['Team summary','Team performance','Quality indicators','Week ahead','User feedback'] },
+    'operations-agent': { label: 'Operations — Agent analytics', question: 'Is the agent analytics section giving you what you need?', elements: ['Agent summary','Agent performance','Active alerts','Agent quality indicators'] },
+  };
+
+  const fbReasonMap = {
+    home: ['Information was incomplete','Layout made it hard to scan','Something was missing','Data appeared incorrect','Other'],
+    actions: ['Information was incomplete','AI recommendation appeared incorrect','Missing context for the decision','Customer circumstance not reflected','Layout was confusing','Other'],
+    'actions-item': ['Information was incomplete','AI recommendation appeared incorrect','Missing context for the decision','Customer circumstance not reflected','I disagreed with the proposed amount','Other'],
+    claims: ['Information was incomplete','Missing context for the decision','Data was hard to read','Something was missing from the list','Other'],
+    'claims-detail': ['Information was incomplete','Missing context for the decision','Data appeared incorrect','Something was hard to find','Other'],
+    'operations-team': ['Data appeared incorrect','Something was missing','Layout was confusing','Metrics were unclear','Other'],
+    'operations-agent': ['Data appeared incorrect','Something was missing','Alert information was unclear','Metrics were unclear','Other'],
+  };
+
+  const fbHistory = [
+    { date: '30 Mar 2026', context: 'Actions — Approve total loss determination', response: 'Partly', reason: 'Information was incomplete', reviewed: true },
+    { date: '28 Mar 2026', context: 'Claims list', response: 'Yes', reason: '', reviewed: true },
+    { date: '26 Mar 2026', context: 'Operations — Team analytics', response: 'No', reason: 'Something was missing', reviewed: false },
+    { date: '24 Mar 2026', context: 'Home', response: 'Yes', reason: '', reviewed: false },
+  ];
+
+  let fbCurrentContext = 'home';
+  let fbSelectedResponse = null;
+  let fbSelectedReasons = [];
+  let fbSelectedElement = null;
+
+  function detectContext() {
+    const screen = document.querySelector('.screen.active');
+    if (!screen) return 'home';
+    const id = screen.id;
+    if (id === 'screen-home-member') return 'home';
+    if (id === 'screen-actions') return 'actions-item';
+    if (id === 'screen-claims') return 'claims';
+    if (id === 'screen-claim-detail') return 'claims-detail';
+    if (id === 'screen-operations') return 'operations-team';
+    return 'home';
+  }
+
+  function openFeedback() {
+    fbCurrentContext = detectContext();
+    fbSelectedResponse = null;
+    fbSelectedReasons = [];
+    fbSelectedElement = null;
+    renderFeedbackPanel();
+    document.getElementById('feedback-panel').classList.add('open');
+    document.getElementById('fb-overlay').classList.add('open');
+  }
+
+  function closeFeedback() {
+    document.getElementById('feedback-panel').classList.remove('open');
+    document.getElementById('fb-overlay').classList.remove('open');
+  }
+
+  function switchFbTab(tab, btn) {
+    document.getElementById('fb-tab-new').style.display = tab === 'new' ? 'flex' : 'none';
+    document.getElementById('fb-tab-history').style.display = tab === 'history' ? 'flex' : 'none';
+    document.querySelectorAll('.fb-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (tab === 'history') renderHistory();
+  }
+
+  function renderFeedbackPanel() {
+    const ctx = fbContextMap[fbCurrentContext] || fbContextMap['home'];
+    document.getElementById('fb-context-label').textContent = ctx.label;
+    document.getElementById('fb-context-change').style.display = 'none';
+    document.getElementById('fb-change-link').textContent = 'Change ›';
+    document.getElementById('fb-question').textContent = ctx.question;
+    // elements
+    const grid = document.getElementById('fb-element-grid');
+    grid.innerHTML = '';
+    document.getElementById('fb-element-section').style.display = ctx.elements.length ? '' : 'none';
+    ctx.elements.forEach(el => {
+      const btn = document.createElement('button');
+      btn.className = 'fb-element-btn';
+      btn.textContent = el;
+      btn.onclick = () => selectElement(el, btn);
+      grid.appendChild(btn);
+    });
+    // reset response
+    document.querySelectorAll('.fb-response-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('fb-reasons-section').style.display = 'none';
+    // freetext always visible
+    document.getElementById('fb-submit-btn').disabled = true;
+    document.getElementById('fb-freetext').value = '';
+    document.getElementById('fb-char-count').textContent = '0';
+  }
+
+  function selectElement(el, btn) {
+    fbSelectedElement = fbSelectedElement === el ? null : el;
+    document.querySelectorAll('.fb-element-btn').forEach(b => b.classList.remove('selected'));
+    if (fbSelectedElement) btn.classList.add('selected');
+  }
+
+  function toggleContextChange() {
+    const el = document.getElementById('fb-context-change');
+    const link = document.getElementById('fb-change-link');
+    const isOpen = el.style.display !== 'none';
+    el.style.display = isOpen ? 'none' : '';
+    link.textContent = isOpen ? 'Change ›' : 'Cancel';
+    if (!isOpen) {
+      const sel = document.getElementById('fb-context-select');
+      sel.value = fbCurrentContext;
+      setTimeout(() => sel.focus(), 50);
+    }
+  }
+
+  function updateContextFromSelect() {
+    fbCurrentContext = document.getElementById('fb-context-select').value;
+    document.getElementById('fb-context-change').style.display = 'none';
+    document.getElementById('fb-change-link').textContent = 'Change ›';
+    renderFeedbackPanel();
+  }
+
+  function selectResponse(val, btn) {
+    fbSelectedResponse = val;
+    document.querySelectorAll('.fb-response-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    const negative = val === 'partly' || val === 'no';
+    document.getElementById('fb-reasons-section').style.display = negative ? '' : 'none';
+    document.getElementById('fb-freetext-lbl').textContent = negative ? 'Anything else worth noting?' : 'Anything else worth noting?';
+    document.getElementById('fb-submit-btn').disabled = false;
+    if (negative) renderReasons();
+  }
+
+  function renderReasons() {
+    const reasons = fbReasonMap[fbCurrentContext] || fbReasonMap['home'];
+    const list = document.getElementById('fb-reason-list');
+    list.innerHTML = '';
+    reasons.forEach(r => {
+      const btn = document.createElement('button');
+      btn.className = 'fb-reason-btn';
+      btn.textContent = r;
+      btn.onclick = () => {
+        btn.classList.toggle('selected');
+        if (btn.classList.contains('selected')) {
+          fbSelectedReasons.push(r);
+          if (r === 'Other') {
+            let inp = document.getElementById('fb-other-input');
+            if (!inp) {
+              inp = document.createElement('input');
+              inp.id = 'fb-other-input';
+              inp.type = 'text';
+              inp.placeholder = 'Describe the issue…';
+              inp.style.cssText = 'width:100%;padding:7px 10px;font-size:12px;font-family:inherit;color:var(--text-primary);background:var(--page-bg);border:1px solid var(--card-border);border-radius:var(--r-sm);box-sizing:border-box;margin-top:5px;';
+              inp.oninput = () => {
+                fbSelectedReasons = fbSelectedReasons.filter(x => x !== 'Other');
+                if (inp.value.trim()) fbSelectedReasons.push('Other: ' + inp.value.trim());
+              };
+              btn.insertAdjacentElement('afterend', inp);
+              setTimeout(() => inp.focus(), 50);
+            }
+          }
+        } else {
+          fbSelectedReasons = fbSelectedReasons.filter(x => x !== r && !x.startsWith('Other:'));
+          if (r === 'Other') {
+            const inp = document.getElementById('fb-other-input');
+            if (inp) inp.remove();
+          }
+        }
+      };
+      list.appendChild(btn);
+    });
+  }
+
+  function updateCharCount() {
+    const val = document.getElementById('fb-freetext').value;
+    document.getElementById('fb-char-count').textContent = val.length;
+  }
+
+  function submitFeedback() {
+    const ctx = fbContextMap[fbCurrentContext] || fbContextMap['home'];
+    fbHistory.unshift({
+      date: '1 Apr 2026',
+      context: ctx.label + (fbSelectedElement ? ' — ' + fbSelectedElement : ''),
+      response: fbSelectedResponse === 'yes' ? 'Yes' : fbSelectedResponse === 'partly' ? 'Partly' : 'No',
+      reason: fbSelectedReasons.join(', '),
+      reviewed: false,
+    });
+    closeFeedback();
+    const btn = document.getElementById('feedback-trigger-btn');
+    const orig = btn.textContent;
+    btn.textContent = 'Feedback received';
+    btn.style.color = '#059669';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 3000);
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('fb-history-list');
+    list.innerHTML = '';
+    if (fbHistory.length === 0) {
+      list.innerHTML = '<p style="font-size:12px;color:var(--text-tertiary);">No feedback submitted yet.</p>';
+      return;
+    }
+    fbHistory.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'fb-history-item';
+      el.innerHTML = '<div class="fb-history-meta"><span>' + item.date + '</span>' +
+        (item.reviewed ? '<span class="fb-reviewed-badge">Reviewed</span>' : '') +
+        '</div>' +
+        '<div class="fb-history-context">' + item.context + '</div>' +
+        '<div class="fb-history-response">Response: <strong>' + item.response + '</strong>' +
+        (item.reason ? ' &nbsp;&middot;&nbsp; ' + item.reason : '') + '</div>';
+      list.appendChild(el);
+    });
+  }
+
+    const titles = { home: 'Home', actions: 'Actions', claims: 'Claims', operations: 'Operations' };
   let currentHomeVariant = 'member';
 
   function showScreen(name) {
