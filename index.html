@@ -40,19 +40,7 @@
   .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #1a1f2e; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .user-name { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
   .main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
-  .page-head { padding: 16px 24px 14px; border-bottom: 1px solid var(--card-border); background: var(--nav-bg); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-  .page-head h1 { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; }
-  .page-date { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
-  .profile-cluster { display: flex; align-items: center; gap: 12px; }
-  .profile-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1a1f2e; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
-  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .profile-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-  .profile-role { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; }
-  .profile-icon-btn { width: 30px; height: 30px; border: 1px solid var(--card-border); border-radius: var(--r-sm); background: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-tertiary); flex-shrink: 0; }
-  .profile-icon-btn:hover { background: var(--page-bg); color: var(--text-secondary); }
-  .feedback-btn { padding: 5px 12px; font-size: 12px; font-weight: 500; color: var(--text-secondary); border: 1px solid var(--card-border); border-radius: var(--r-sm); background: none; cursor: pointer; white-space: nowrap; font-family: inherit; }
-  .feedback-btn:hover { background: var(--page-bg); }
-  .profile-divider { width: 1px; height: 20px; background: var(--card-border); }
+  .page-date { font-size: 12px; color: var(--text-tertiary); }
 
   /* Feedback panel */
   .feedback-panel {
@@ -104,6 +92,24 @@
   .fb-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; border-radius: 9999px; background: #dc2626; color: #fff; font-size: 9px; font-weight: 700; padding: 0 4px; margin-left: 4px; vertical-align: middle; }
   .fb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.15); z-index: 99; }
   .fb-overlay.open { display: block; }
+
+  /* Settings panel */
+  .settings-panel { display: none; position: fixed; top: 0; right: 0; bottom: 0; width: 360px; background: var(--card-bg); border-left: 1px solid var(--card-border); box-shadow: -4px 0 16px rgba(0,0,0,0.08); z-index: 100; flex-direction: column; }
+  .settings-panel.open { display: flex; }
+  .settings-section { padding: 18px 20px 14px; border-bottom: 1px solid var(--card-border); }
+  .settings-section:last-child { border-bottom: none; }
+  .settings-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-tertiary); margin-bottom: 12px; }
+  .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--card-border); }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row-label { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  .settings-row-desc { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+  .settings-select { font-size: 12px; font-family: inherit; color: var(--text-primary); background: #f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b92a5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 8px center; border: 1px solid var(--card-border); border-radius: var(--r-sm); padding: 5px 26px 5px 8px; appearance: none; min-width: 130px; }
+  .settings-toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+  .settings-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .settings-toggle-track { position: absolute; inset: 0; background: var(--card-border); border-radius: 10px; cursor: pointer; transition: background 0.2s; }
+  .settings-toggle input:checked + .settings-toggle-track { background: #1a1f2e; }
+  .settings-toggle-track::after { content: ''; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
+  .settings-toggle input:checked + .settings-toggle-track::after { transform: translateX(16px); }
   .toggle-btn { padding: 5px 14px; font-size: 12px; font-weight: 500; color: var(--text-secondary); background: var(--nav-bg); cursor: pointer; user-select: none; }
   .toggle-btn.active { background: #1a1f2e; color: #fff; font-weight: 600; }
   .screen { display: none; flex: 1; overflow-y: auto; }
@@ -386,7 +392,8 @@
     .ops-card-grid .card[style*="grid-column:span 2"] { grid-column: span 1; }
   }
   /* ── Claim detail ── */
-  .cd-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-tertiary); border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px; user-select: none; }
+  .cd-tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: #2563eb; border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px; user-select: none; text-decoration: none; }
+  .cd-tab:hover { color: #1d4ed8; border-bottom-color: #bfdbfe; }
   .cd-tab.active { color: var(--text-primary); font-weight: 700; border-bottom-color: var(--text-primary); }
   .cd-field { display: flex; flex-direction: column; gap: 3px; }
   .cd-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); }
@@ -398,7 +405,15 @@
   .tl-dot.agent { background: #f5f3ff; color: #7c3aed; }
   .tl-dot.human { background: #eff6ff; color: #2563eb; }
   .tl-body { flex: 1; padding-top: 4px; }
-  .tl-meta { font-size: 10px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .tl-meta { font-size: 10px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.4px; display: flex; align-items: center; gap: 8px; }
+  .tl-status { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
+  .tl-status.open { background: var(--watch-bg); color: #d97706; border: 1px solid var(--watch-border); }
+  .tl-status.running { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+  .tl-status.completed { background: var(--ok-bg); color: #059669; border: 1px solid var(--ok-border); }
+  .tl-status.failed { background: var(--alert-bg); color: #dc2626; border: 1px solid var(--alert-border); }
+  .tl-open-task { background: var(--watch-bg); border: 1px solid var(--watch-border); border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 4px; }
+  .tl-open-task-title { font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .tl-open-task-meta { font-size: 11px; color: var(--text-secondary); }
   .tl-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
   .tl-filter-btn { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 9999px; background: var(--page-bg); color: var(--text-secondary); cursor: pointer; user-select: none; border: 1px solid var(--card-border); }
   .tl-filter-btn.active { background: #1a1f2e; color: #fff; font-weight: 600; border-color: #1a1f2e; }
@@ -413,22 +428,27 @@
     <div class="nav-link" onclick="showScreen('claims')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6l-4-4z"/><path d="M9 2v4h4"/><path d="M8 9l-1 3 3-1 2.5-2.5-2-2L8 9z"/></svg>Claims</div>
     <div class="nav-link" onclick="showScreen('operations')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.5 2a2.5 2.5 0 00-2.45 3L2.5 10.5a1.5 1.5 0 002.1 2.1L10 7a2.5 2.5 0 103-4.5l-1.5 1.5-1-1L12 1.5"/><path d="M2 13.5l1-1"/></svg>Operations</div>
   </div>
-  <div class="l-nav-foot"><div class="user-avatar">JC</div><span class="user-name">Jamie C.</span></div>
-</nav>
-<div class="main">
-<div class="page-head" id="main-page-head">
-  <div><h1 id="page-title">Home</h1><p class="page-date">Wednesday 1 April 2026</p></div>
-  <div style="display:flex;align-items:center;gap:12px;">
-
-    <div class="profile-cluster">
-      <div class="profile-avatar">JC</div>
-      <div><div class="profile-name">Jamie Chen</div><div class="profile-role">Claims advisor</div></div>
-      <button class="profile-icon-btn" title="Settings">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h12M2 12h12"/><circle cx="5" cy="4" r="1.5" fill="white"/><circle cx="10" cy="8" r="1.5" fill="white"/><circle cx="6" cy="12" r="1.5" fill="white"/></svg>
+  <div class="l-nav-foot" style="flex-direction:column;align-items:stretch;gap:0;padding:0;">
+    <div style="display:flex;align-items:center;gap:9px;padding:10px 14px 8px;">
+      <div class="user-avatar">JC</div>
+      <div><div class="user-name" style="font-size:12px;font-weight:600;color:var(--text-primary);">Jamie Chen</div><div style="font-size:10px;color:var(--text-tertiary);">Claims advisor</div></div>
+    </div>
+    <div style="border-top:1px solid var(--nav-border);padding:6px 8px;display:flex;flex-direction:column;gap:1px;">
+      <button onclick="openSettings()" style="display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:var(--r-sm);font-size:13px;font-weight:500;color:var(--nav-text);background:none;border:none;cursor:pointer;font-family:inherit;width:100%;text-align:left;" onmouseover="this.style.background='var(--nav-active-bg)'" onmouseout="this.style.background='none'">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.4;flex-shrink:0;"><path d="M2 4h12M2 8h12M2 12h12"/><circle cx="5" cy="4" r="1.5" fill="white"/><circle cx="10" cy="8" r="1.5" fill="white"/><circle cx="6" cy="12" r="1.5" fill="white"/></svg>
+        Settings
       </button>
-      <button class="feedback-btn" onclick="openFeedback()" id="feedback-trigger-btn">Give feedback</button>
+      <button onclick="openFeedback()" id="feedback-trigger-btn" style="display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:var(--r-sm);font-size:13px;font-weight:500;color:var(--nav-text);background:none;border:none;cursor:pointer;font-family:inherit;width:100%;text-align:left;" onmouseover="this.style.background='var(--nav-active-bg)'" onmouseout="this.style.background='none'">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.4;flex-shrink:0;"><path d="M8 2a6 6 0 100 12A6 6 0 008 2z"/><path d="M8 7v3M8 5.5v.5"/></svg>
+        Give feedback
+      </button>
     </div>
   </div>
+</nav>
+<div class="main">
+<div id="main-page-head" style="padding:20px 24px 4px;display:flex;align-items:baseline;justify-content:space-between;flex-shrink:0;">
+  <h1 id="page-title" style="font-size:19px;font-weight:700;letter-spacing:-0.3px;color:var(--text-primary);">Home</h1>
+  <span style="font-size:12px;color:var(--text-tertiary);">Wednesday 1 April 2026</span>
 </div>
 <!-- HOME MEMBER -->
 <div class="screen active" id="screen-home-member"><div class="page-body row">
@@ -481,6 +501,13 @@
 <button class="filter-btn-sm">&#9776; Filters</button>
 </div></div>
 <div class="card-body claims-body">
+<div class="col oc-col"><span class="col-lbl">Open claims</span>
+<div class="oc-total"><span class="oc-num">34</span><span class="oc-lbl">open claims</span></div>
+<div class="oc-tiles">
+<div class="oc-tile no-tasks"><span class="oc-t-lbl">No open tasks</span><span class="oc-t-num">10</span></div>
+<div class="oc-tile open-tasks"><span class="oc-t-lbl">With open tasks</span><span class="oc-t-num">18</span></div>
+<div class="oc-tile overdue"><span class="oc-t-lbl">With overdue tasks</span><span class="oc-t-num">06</span></div>
+</div></div>
 <div class="col chart-col"><span class="col-lbl">Claim completion time</span>
 <svg width="100%" height="120" viewBox="0 0 400 120" preserveAspectRatio="none" style="display:block;width:100%;">
 <text x="0" y="16" font-size="8" fill="#9ca3af">15d</text>
@@ -512,13 +539,6 @@
 <div class="ct-row"><span class="ct-type-lbl">Closure</span><div class="ct-bar-track"><div class="ct-bar-fill" style="width:18%;background:#1e3a8a;"></div></div><span class="ct-count">3</span></div>
 </div>
 <p class="chart-note" style="margin-top:10px">Distribution of open claims across stages</p></div>
-<div class="col oc-col"><span class="col-lbl">Open claims</span>
-<div class="oc-total"><span class="oc-num">34</span><span class="oc-lbl">open claims</span></div>
-<div class="oc-tiles">
-<div class="oc-tile no-tasks"><span class="oc-t-lbl">No open tasks</span><span class="oc-t-num">10</span></div>
-<div class="oc-tile open-tasks"><span class="oc-t-lbl">With open tasks</span><span class="oc-t-num">18</span></div>
-<div class="oc-tile overdue"><span class="oc-t-lbl">With overdue tasks</span><span class="oc-t-num">06</span></div>
-</div></div>
 </div></div>
 </div></div>
 <!-- ACTIONS SCREEN -->
@@ -982,15 +1002,26 @@
 <div class="card"><div class="card-head"><h2>Tasks and actions</h2>
 <div style="display:flex;gap:6px;"><span class="tl-filter-btn active">All</span><span class="tl-filter-btn">Agent</span><span class="tl-filter-btn">Human</span></div></div>
 <div style="padding:16px 20px;display:flex;flex-direction:column;gap:0;position:relative;">
-<div style="position:absolute;left:31px;top:24px;bottom:24px;width:2px;background:var(--card-border);"></div>
-<div class="tl-entry"><div class="tl-dot human">JC</div><div class="tl-body"><div class="tl-meta">30 Mar 2026 &middot; 9:14 am &middot; J. Chen</div><div class="tl-text">Reviewed settlement calculation. Returned to agent to confirm salvage collection arrangements before approving payment.</div></div></div>
-<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">28 Mar 2026 &middot; 2:30 pm &middot; Agent</div><div class="tl-text">Settlement calculation completed. Proposed amount $26,980.00 based on market valuation less excess and salvage value. Finance payout of $12,400.00 confirmed with lender. Escalated to advisor for approval.</div></div></div>
-<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">25 Mar 2026 &middot; 11:05 am &middot; Agent</div><div class="tl-text">Market valuation retrieved from approved valuation provider. Vehicle value confirmed at $28,400.00. Statutory write-off status confirmed.</div></div></div>
-<div class="tl-entry"><div class="tl-dot human">JC</div><div class="tl-body"><div class="tl-meta">22 Mar 2026 &middot; 3:15 pm &middot; J. Chen</div><div class="tl-text">Contacted insured to advise total loss outcome and explain the settlement process. Insured requested time to consider. Follow-up scheduled for 27 March.</div></div></div>
-<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">21 Mar 2026 &middot; 9:00 am &middot; Agent</div><div class="tl-text">Repair assessment received. Repair cost estimate $31,250.00 exceeds vehicle value. Total loss determination triggered. PPSR search completed, one encumbrance found, finance payout required.</div></div></div>
-<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">18 Mar 2026 &middot; 4:45 pm &middot; Agent</div><div class="tl-text">Fraud referral submitted based on inconsistencies in incident description and prior claim history. Under review by investigations team.</div></div></div>
-<div class="tl-entry"><div class="tl-dot human">JC</div><div class="tl-body"><div class="tl-meta">16 Mar 2026 &middot; 10:20 am &middot; J. Chen</div><div class="tl-text">Liability assessment completed. Insured not at fault. Third-party recovery flagged for post-settlement action.</div></div></div>
-<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">15 Mar 2026 &middot; 8:55 am &middot; Agent</div><div class="tl-text">Claim lodged. Cover verified. Policy active at time of incident. Repair assessment arranged with McCarthy Panel, Artarmon.</div></div></div>
+
+<!-- Open task -->
+<div class="tl-open-task">
+  <div class="tl-open-task-title">
+    Approve total loss settlement and release payment
+    <span class="tl-status open">Open</span>
+  </div>
+  <div class="tl-open-task-meta">Assigned to J. Chen &nbsp;&middot;&nbsp; Due 1 Apr 2026 &nbsp;&middot;&nbsp; Overdue 3 days</div>
+</div>
+
+<div style="position:absolute;left:31px;top:120px;bottom:24px;width:2px;background:var(--card-border);"></div>
+
+<div class="tl-entry"><div class="tl-dot human">JC</div><div class="tl-body"><div class="tl-meta">30 Mar 2026 &middot; 9:14 am &middot; J. Chen <span class="tl-status completed">Completed</span></div><div class="tl-text">Reviewed settlement calculation. Returned to agent to confirm salvage collection arrangements before approving payment.</div></div></div>
+<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">28 Mar 2026 &middot; 2:30 pm &middot; Agent <span class="tl-status completed">Completed</span></div><div class="tl-text">Settlement calculation completed. Proposed amount $26,980.00 based on market valuation less excess and salvage value. Finance payout of $12,400.00 confirmed with lender. Escalated to advisor for approval.</div></div></div>
+<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">25 Mar 2026 &middot; 11:05 am &middot; Agent <span class="tl-status completed">Completed</span></div><div class="tl-text">Market valuation retrieved from approved valuation provider. Vehicle value confirmed at $28,400.00. Statutory write-off status confirmed.</div></div></div>
+<div class="tl-entry"><div class="tl-dot human">JC</div><div class="tl-body"><div class="tl-meta">22 Mar 2026 &middot; 3:15 pm &middot; J. Chen <span class="tl-status completed">Completed</span></div><div class="tl-text">Contacted insured to advise total loss outcome and explain the settlement process. Insured requested time to consider. Follow-up scheduled for 27 March.</div></div></div>
+<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">21 Mar 2026 &middot; 9:00 am &middot; Agent <span class="tl-status completed">Completed</span></div><div class="tl-text">Repair assessment received. Repair cost estimate $31,250.00 exceeds vehicle value. Total loss determination triggered. PPSR search completed, one encumbrance found, finance payout required.</div></div></div>
+<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">18 Mar 2026 &middot; 4:45 pm &middot; Agent <span class="tl-status running">Running</span></div><div class="tl-text">Fraud referral submitted based on inconsistencies in incident description and prior claim history. Under review by investigations team.</div></div></div>
+<div class="tl-entry"><div class="tl-dot human">JC</div><div class="tl-body"><div class="tl-meta">16 Mar 2026 &middot; 10:20 am &middot; J. Chen <span class="tl-status completed">Completed</span></div><div class="tl-text">Liability assessment completed. Insured not at fault. Third-party recovery flagged for post-settlement action.</div></div></div>
+<div class="tl-entry"><div class="tl-dot agent">AI</div><div class="tl-body"><div class="tl-meta">15 Mar 2026 &middot; 8:55 am &middot; Agent <span class="tl-status completed">Completed</span></div><div class="tl-text">Claim lodged. Cover verified. Policy active at time of incident. Repair assessment arranged with McCarthy Panel, Artarmon.</div></div></div>
 </div></div></div>
 
 <div id="tab-stages" style="display:none;">
@@ -1009,6 +1040,131 @@
 </div>
 </div></div></div>
 
+
+<!-- Settings overlay -->
+<div class="fb-overlay" id="settings-overlay" onclick="closeSettings()"></div>
+
+<!-- Settings panel -->
+<div class="settings-panel" id="settings-panel">
+  <div class="fb-panel-head">
+    <h2>Settings</h2>
+    <button class="fb-close-btn" onclick="closeSettings()">&#x2715;</button>
+  </div>
+  <div style="flex:1;overflow-y:auto;">
+
+    <div class="settings-section">
+      <div class="settings-section-title">Default page</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Open on login</div>
+          <div class="settings-row-desc">Choose which page loads when you sign in</div>
+        </div>
+        <select class="settings-select" id="setting-default-page">
+          <option value="home">Home</option>
+          <option value="actions" selected>Actions</option>
+          <option value="claims">Claims</option>
+          <option value="operations">Operations</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Actions queue</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Default tab</div>
+          <div class="settings-row-desc">Which tab opens when you go to Actions</div>
+        </div>
+        <select class="settings-select">
+          <option selected>Overdue</option>
+          <option>All</option>
+          <option>Due today</option>
+          <option>Upcoming</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Show overdue count in nav</div>
+          <div class="settings-row-desc">Display a badge on the Actions nav item</div>
+        </div>
+        <label class="settings-toggle"><input type="checkbox" checked><span class="settings-toggle-track"></span></label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Notifications</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">New actions assigned to me</div>
+          <div class="settings-row-desc">Alert when a new action lands in your queue</div>
+        </div>
+        <label class="settings-toggle"><input type="checkbox" checked><span class="settings-toggle-track"></span></label>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Overdue reminders</div>
+          <div class="settings-row-desc">Remind me when actions pass their due date</div>
+        </div>
+        <label class="settings-toggle"><input type="checkbox" checked><span class="settings-toggle-track"></span></label>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Agent alerts</div>
+          <div class="settings-row-desc">Notify me when an agent faults or degrades</div>
+        </div>
+        <label class="settings-toggle"><input type="checkbox"><span class="settings-toggle-track"></span></label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Display</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Date format</div>
+        </div>
+        <select class="settings-select">
+          <option selected>1 Apr 2026</option>
+          <option>01/04/2026</option>
+          <option>Apr 1, 2026</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Time format</div>
+        </div>
+        <select class="settings-select">
+          <option selected>9:14 am</option>
+          <option>09:14</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Compact view</div>
+          <div class="settings-row-desc">Reduce spacing in lists and tables</div>
+        </div>
+        <label class="settings-toggle"><input type="checkbox"><span class="settings-toggle-track"></span></label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Accessibility</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">High contrast mode</div>
+        </div>
+        <label class="settings-toggle"><input type="checkbox"><span class="settings-toggle-track"></span></label>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Reduce motion</div>
+          <div class="settings-row-desc">Minimise animated transitions</div>
+        </div>
+        <label class="settings-toggle"><input type="checkbox"><span class="settings-toggle-track"></span></label>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <!-- Feedback overlay -->
 <div class="fb-overlay" id="fb-overlay" onclick="closeFeedback()"></div>
@@ -1141,6 +1297,15 @@
     return 'home';
   }
 
+
+  function openSettings() {
+    document.getElementById('settings-panel').classList.add('open');
+    document.getElementById('settings-overlay').classList.add('open');
+  }
+  function closeSettings() {
+    document.getElementById('settings-panel').classList.remove('open');
+    document.getElementById('settings-overlay').classList.remove('open');
+  }
   function openFeedback() {
     fbCurrentContext = detectContext();
     fbSelectedResponse = null;
@@ -1314,7 +1479,7 @@
 
   function showScreen(name) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('main-page-head').style.display = '';
+    document.getElementById('main-page-head').style.display = 'flex';
     if (name === 'home') {
       document.getElementById('screen-home-' + currentHomeVariant).classList.add('active');
     } else {
